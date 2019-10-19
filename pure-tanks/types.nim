@@ -2,7 +2,7 @@
 type
   Angle = float
   Position = array[2, int]
-  Name* = string
+  Name = string
 
   Player* = object
     angle: Angle
@@ -13,7 +13,7 @@ type
   Projectile* = object
     angle: Angle
     pos: Position
-    owner*: Player
+    owner*: Name
 
   Rect* = object
     pos: Position
@@ -25,3 +25,18 @@ type
     projectiles*: seq[Projectile]
     players*: seq[Player]
     map: Map
+
+  Action = enum
+    forward,
+    backward,
+    right,
+    left,
+    shoot,
+    join
+
+  Command = tuple[name: Name, action: Action]
+
+  Config* = object
+    timemod: float
+    playerspeed: float
+    projectilespeed: float
