@@ -1,5 +1,6 @@
 # std lib
 import sequtils
+import tables
 import sugar
 
 # app imports
@@ -8,7 +9,7 @@ import vector
 
 func player_forward(info: UpdateInfo, player: Player): Player =
   # returns the resulting player, after applying the "forward" command
-  let distance = info.config.playerspeed * info.config.timemod * (float) delta_t
+  let distance = info.config.playerspeed * info.config.timemod * (float) info.delta_t
   let new_position = move(player.position, player.angle, distance)
   return Player(angle: player.angle,
                 kills: player.kills,
@@ -24,9 +25,9 @@ func get_player(info: UpdateInfo, name: Name): Player =
     return matching_players[0]
 
 
-func handle_move_command(info: UpdateInfo, command: Command): GameState =
+func handle_move_command(info: UpdateInfo, cmd: Command): GameState =
     ## return GameState after handling exactly one Command
-    let player = info.get_player(command.name)
+    let player = info.get_player(cmd.name)
 
     # table mapping Actions to move functions
     # TODO: complete movement functions
@@ -37,25 +38,32 @@ func handle_move_command(info: UpdateInfo, command: Command): GameState =
       right: nil
     }.toTable
 
-    # apply relevant move function to player matching command
-    let new_players = map(players, p => movefuncs[cmd.action](p) if p == player)
+    # apply relevant move function to command-issuing player only
+    func apply_function(p: Player): Player =
+      if p == player:
+        # call function found in move_funcions table
+        return move_functions[cmd.action](info, p)
+      else:
+        return p
+    let new_players = map(info.state.players, apply_function)
 
     # assemble and return new game state
     let new_state = GameState(
       players: new_players,
-      projectiles: state.projectiles,
-
+      projectiles: info.state.projectiles,
+      map: info.state.map
     )
     return new_state
 
 
 
-func update*(state: GameState, config: Config,
-            delta_t: int, commands: openArray[Command]): GameState =
+func update*(info: UpdateInfo, commands: openArray[Command]): GameState =
 
-  for cmd in commands:
-    let new_state = handle_player_command(state, config, delta_t, cmd)
+  func f(state: GameState, cmd: Command): GameState =
+    let finfo = UpdateInfo(state: state,
+                           config: info.config,
+                           delta_t: info.delta_t)
+    return handle_move_command(finfo, cmd)
 
+  let new_state: GameState = foldl(commands, f, info.state)
   return new_state
-
-

@@ -1,6 +1,6 @@
 type
   Angle* = float
-  Position* = array[2, int]
+  Position* = array[2, float]
   Name* = string
 
   Player* = object
@@ -40,3 +40,7 @@ type
     playerspeed*: float #distance/microseconds
     projectilespeed*: float #distance/microseconds
 
+  UpdateInfo* = object
+    state*: GameState
+    config*: Config
+    delta_t*: int
