@@ -12,7 +12,7 @@ suite "Game logic tests":
       Player(
         name: Name("John"),
         angle: Angle(0),
-        position: Position([100,100]),
+        position: Position([100.0, 100.0]),
         kills: 0,
         deaths: 0,
       )
@@ -30,9 +30,16 @@ suite "Game logic tests":
       projectilespeed: 1.5
     )
 
+    let info = UpdateInfo(
+      state: state,
+      config: config,
+      delta_t: 100
+    )
+
     let commands = @[
       Command((name: Name("John"), action: forward))
     ]
-    let new_state = update(state, config, 100, commands)
 
-    check(new_state.players[0].position == Position([100,0]))
+    let new_state = update(info, commands)
+
+    check(new_state.players[0].position == Position([200.0, 100.0]))
