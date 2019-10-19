@@ -1,5 +1,5 @@
 import unittest, strutils
-import game, types
+import types, game
 suite "Game logic tests":
   setup:
     echo "setup"
@@ -10,7 +10,7 @@ suite "Game logic tests":
   test "simple move forward":
     let players = @[
       Player(
-        name: "John",
+        name: Name("John"),
         angle: Angle(0),
         position: Position([100,100]),
         kills: 0,
@@ -30,15 +30,9 @@ suite "Game logic tests":
       projectilespeed: 1.5
     )
 
-    let commands = [
-      Command((name: "John", action: parseEnum[Action]("forward")))
+    let commands = @[
+      Command((name: Name("John"), action: forward))
     ]
-    
-    let new_state = update(
-     state: state,
-     config: config,
-     delta_t: 100,
-     commands: commands
-    )
+    let new_state = update(state, config, 100, commands)
 
     check(new_state.players[0].position == Position([100,0]))
