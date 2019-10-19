@@ -1,4 +1,3 @@
-
 import types
 
 func update(state: GameState, config: Config,

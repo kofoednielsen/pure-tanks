@@ -1,4 +1,3 @@
-
 type
   Angle = float
   Position = array[2, int]
