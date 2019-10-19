@@ -1,0 +1,27 @@
+
+type
+  Angle = float
+  Position = array[2, int]
+  Name* = string
+
+  Player* = object
+    angle: Angle
+    pos: Position
+    kills, deaths: int
+    name*: Name
+
+  Projectile* = object
+    angle: Angle
+    pos: Position
+    owner*: Player
+
+  Rect* = object
+    pos: Position
+    width, height: int
+
+  Map = seq[Rect]
+
+  GameState* = object
+    projectiles*: seq[Projectile]
+    players*: seq[Player]
+    map: Map
