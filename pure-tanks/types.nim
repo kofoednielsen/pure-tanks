@@ -2,7 +2,7 @@
 type
   Angle = float
   Position = array[2, int]
-  Name = string
+  Name* = string
 
   Player* = object
     angle: Angle
@@ -27,9 +27,14 @@ type
     map: Map
 
   Action = enum
-    forward, backward, right, left, shoot, join
+    forward = "forward",
+    backward = "backward",
+    right = "right",
+    left = "left",
+    shoot = "shoot",
+    join = "join"
 
-  Command = tuple[name: Name, action: Action]
+  Command* = tuple[name: Name, action: Action]
 
   Config* = object
     timemod: float
