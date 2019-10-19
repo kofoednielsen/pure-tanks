@@ -27,16 +27,12 @@ type
     map: Map
 
   Action = enum
-    forward,
-    backward,
-    right,
-    left,
-    shoot,
-    join
+    forward, backward, right, left, shoot, join
 
   Command = tuple[name: Name, action: Action]
 
   Config* = object
     timemod: float
-    playerspeed: float
-    projectilespeed: float
+    playerspeed: float #distance/microseconds
+    projectilespeed: float #distance/microseconds
+
