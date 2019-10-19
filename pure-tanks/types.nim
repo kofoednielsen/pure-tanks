@@ -1,31 +1,31 @@
 type
-  Angle = float
-  Position = array[2, int]
+  Angle* = float
+  Position* = array[2, int]
   Name* = string
 
   Player* = object
-    angle: Angle
-    pos: Position
-    kills, deaths: int
+    angle*: Angle
+    position*: Position
+    kills*, deaths*: int
     name*: Name
 
   Projectile* = object
-    angle: Angle
-    pos: Position
+    angle*: Angle
+    position*: Position
     owner*: Name
 
   Rect* = object
-    pos: Position
+    position*: Position
     width, height: int
 
-  Map = seq[Rect]
+  Map* = seq[Rect]
 
   GameState* = object
     projectiles*: seq[Projectile]
     players*: seq[Player]
-    map: Map
+    map*: Map
 
-  Action = enum
+  Action* = enum
     forward = "forward",
     backward = "backward",
     right = "right",
@@ -36,7 +36,7 @@ type
   Command* = tuple[name: Name, action: Action]
 
   Config* = object
-    timemod: float
-    playerspeed: float #distance/microseconds
-    projectilespeed: float #distance/microseconds
+    timemod*: float
+    playerspeed*: float #distance/microseconds
+    projectilespeed*: float #distance/microseconds
 
