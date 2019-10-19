@@ -57,7 +57,7 @@ func handle_move_command(info: UpdateInfo, cmd: Command): GameState =
 
 
 
-func update*(info: UpdateInfo, commands: openArray[Command]): GameState =
+func update*(info: UpdateInfo, commands: seq[Command]): GameState =
 
   func f(state: GameState, cmd: Command): GameState =
     let finfo = UpdateInfo(state: state,
@@ -65,5 +65,5 @@ func update*(info: UpdateInfo, commands: openArray[Command]): GameState =
                            delta_t: info.delta_t)
     return handle_move_command(finfo, cmd)
 
-  let new_state: GameState = foldl(commands, f, info.state)
+  let new_state: GameState = foldl(commands, f(a, b), info.state)
   return new_state
