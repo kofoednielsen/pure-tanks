@@ -1,12 +1,8 @@
+# std imports
 import unittest, strutils, math
-import vector
 
-
-proc `=~` *(x, y: float): bool =
-  ## Define `=~` operator for approximate float comparisions
-  const eps = 1.0e-7
-  result = abs(x - y) < eps
-
+#app imports
+import mathutils
 
 suite "wrap_angle tests":
 
