@@ -91,5 +91,5 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: counterclockwise))
     ]
     let newstate = update(state, config, 3, commands)
-    check(newstate.players[0].angle == Angle(-3 * (PI / 4)))
-    check(newstate.players[1].angle == Angle(-PI / 4))
+    check(newstate.players[0].angle =~ Angle(-3 * (PI / 4)))
+    check(newstate.players[1].angle =~ Angle(-PI / 4))
