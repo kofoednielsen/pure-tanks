@@ -6,7 +6,7 @@ dist: trusty
 language: c
 
 install:
-  - export CHOOSENIM_CHOOSE_VERSION="0.18.0"
+  - export CHOOSENIM_CHOOSE_VERSION="0.19.4"
   - |
       curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
       sh init.sh -y
