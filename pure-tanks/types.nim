@@ -37,10 +37,10 @@ type
 
   Config* = object
     timemod*: float
-    playerspeed*: float #distance/microseconds
-    projectilespeed*: float #distance/microseconds
+    playerspeed*: float      #  distance/microseconds
+    projectilespeed*: float  #  distance/microseconds
 
   UpdateInfo* = object
     state*: GameState
     config*: Config
-    delta_t*: int
+    dt*: int  #  microseconds  

@@ -30,16 +30,10 @@ suite "Game logic tests":
       projectilespeed: 1.5
     )
 
-    let info = UpdateInfo(
-      state: state,
-      config: config,
-      delta_t: 100
-    )
-
     let commands = @[
       Command((name: Name("John"), action: forward))
     ]
 
-    let new_state = update(info, commands)
+    let newstate = update(state, config, 100, commands)
 
-    check(new_state.players[0].position == Position([200.0, 100.0]))
+    check(newstate.players[0].position == Position([200.0, 100.0]))
