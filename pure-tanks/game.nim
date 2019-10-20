@@ -1,7 +1,7 @@
 # std lib
 import sequtils, tables, sugar, math
 # app imports
-import types, vector
+import types, mathutils
 
 func move_linear(info: UpdateInfo, player: Player, coef: float): Player =
   # Move the player and return the resulting player object

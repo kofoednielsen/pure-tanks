@@ -4,6 +4,13 @@ import math
 # app imports
 import types
 
+
+func `=~` *(x, y: float): bool =
+  ## Define `=~` operator for approximate float comparisions
+  const eps = 1.0e-7
+  result = abs(x - y) < eps
+
+
 func move*(position: Position, angle: Angle, distance: float): Position =
   ## Returns the Position obtained by moving `distance` in direction `angle`
   return Position([

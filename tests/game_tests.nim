@@ -1,12 +1,5 @@
 import unittest, strutils, math
-import types, game
-
-
-proc `=~` *(x, y: float): bool =
-  ## Define `=~` operator for approximate float comparisions
-  const eps = 1.0e-7
-  result = abs(x - y) < eps
-
+import types, game, mathutils
 
 suite "Game logic tests":
   setup:
