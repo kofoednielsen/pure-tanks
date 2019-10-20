@@ -42,7 +42,7 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     # TODO: complete movement functions
     const mvfuncs = {
       forward: move_forward,
-      backward: nil,
+      backward: move_backward,
       left: nil,
       right: nil
     }.toTable
@@ -72,7 +72,8 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
 func update*(state: GameState, config: Config, dt: int,
              commands: seq[Command]): GameState =
   ## Progresses GameState one tick, (by `dt`)
-  
+  assert(len(commands) == len(deduplicate(map(commands, cmd => cmd.name))),
+         "More than one commands from the same player")
   # Group update related info for shorter function calls   
   let info = UpdateInfo(
     state: state,

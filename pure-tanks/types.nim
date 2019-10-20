@@ -1,5 +1,5 @@
 type
-  Angle* = float
+  Angle* = float  #  radians
   Position* = array[2, float]
   Name* = string
 
