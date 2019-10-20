@@ -12,9 +12,5 @@ install:
       sh init.sh -y
   - export PATH=$HOME/.nimble/bin:$PATH
 
-before_script:
-  - set -e
-  - set -x
-
 script:
   - make test
