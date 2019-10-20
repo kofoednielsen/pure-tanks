@@ -1,11 +1,11 @@
 # std lib
-import sequtils, tables, sugar
+import sequtils, tables, sugar, math
 # app imports
 import types, vector
 
 func move_linear(info: UpdateInfo, player: Player, coef: float): Player =
   # Move the player and return the resulting player object
-  let distance = (info.config.playerspeed *
+  let distance = (info.config.movementspeed *
                   info.config.timemod *
                   float(info.dt) *
                   coef)  # direction coefficient
@@ -28,6 +28,39 @@ func move_backward(info: UpdateInfo, player: Player): Player =
   return move_linear(info, player, -1.0)
 
 
+func move_rotate(info: UpdateInfo, player: Player, coef: float): Player =
+  ## Return the Player after rotating in direction indicated by `coef`
+  let angledelta = (info.config.rotationspeed *
+                    info.config.timemod *
+                    float(info.dt) *
+                    coef)
+  let newangle = player.angle + angledelta
+
+  # wrap angle into range [-PI;PI]
+  # (mysterious piece of maths that does what we want)
+  # let wrappedangle = arctan2(sin(newangle), cos(newangle))
+  let wrappedangle = wrap_angle(newangle)
+  assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
+         "Got angle outside range [-PI;PI]")
+
+  return Player(angle: wrappedangle,
+                kills: player.kills,
+                deaths: player.deaths,
+                name: player.name,
+                position: player.position)
+
+
+func move_counterclockwise(info: UpdateInfo, player: Player): Player =
+  ## Return the Player after rotating counterclockwise
+  return move_rotate(info, player, 1.0)
+
+
+func move_clockwise(info: UpdateInfo, player: Player): Player =
+  ## Return the Player after rotating clockwise
+  return move_rotate(info, player, -1.0)
+
+
+
 func get_player(info: UpdateInfo, name: Name): Player =
     ## returns Player matching Name
     let matches = filter(info.state.players, p => p.name == name)
@@ -43,8 +76,8 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     const mvfuncs = {
       forward: move_forward,
       backward: move_backward,
-      left: nil,
-      right: nil
+      counterclockwise: move_counterclockwise,
+      clockwise: move_clockwise
     }.toTable
 
     # find the command-issuing player

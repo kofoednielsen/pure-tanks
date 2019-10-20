@@ -28,8 +28,8 @@ type
   Action* = enum
     forward = "forward",
     backward = "backward",
-    right = "right",
-    left = "left",
+    clockwise = "clockwise",
+    counterclockwise = "counterclockwise",
     shoot = "shoot",
     join = "join"
 
@@ -37,7 +37,8 @@ type
 
   Config* = object
     timemod*: float
-    playerspeed*: float      #  distance/microseconds
+    rotationspeed*: float    #  radians/microseconds [-PI;PI]
+    movementspeed*: float    #  distance/microseconds
     projectilespeed*: float  #  distance/microseconds
 
   UpdateInfo* = object

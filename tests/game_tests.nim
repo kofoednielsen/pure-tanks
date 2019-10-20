@@ -1,5 +1,13 @@
 import unittest, strutils, math
 import types, game
+
+
+proc `=~` *(x, y: float): bool =
+  ## Define `=~` operator for approximate float comparisions
+  const eps = 1.0e-7
+  result = abs(x - y) < eps
+
+
 suite "Game logic tests":
   setup:
     let state = GameState(
@@ -24,9 +32,11 @@ suite "Game logic tests":
     )
     let config = Config(
       timemod: 1,
-      playerspeed: 1,
-      projectilespeed: 1.5
+      movementspeed: 1,
+      rotationspeed: PI/4,
+      projectilespeed: 1.5,
     )
+
 
   test "more than one command per player":
     let commands = @[
@@ -36,6 +46,7 @@ suite "Game logic tests":
     expect(AssertionError):
       let newstate = update(state, config, 100, commands)
   
+
   test "simple move forward":
     let commands = @[
       Command((name: Name("John"), action: forward)),
@@ -55,6 +66,7 @@ suite "Game logic tests":
     check(newstate.players[0].position == Position([0.0, 100.0]))
     check(newstate.players[1].position == Position([300.0, 200.0]))
   
+
   test "simple move forward, then backwards":
     let newstateone = update(state, config, 100,
                           @[Command((name: Name("John"), action: forward))])
@@ -62,3 +74,22 @@ suite "Game logic tests":
     let newstatetwo = update(newstateone, config, 100,
                           @[Command((name: Name("John"), action: backward))])
     check(newstatetwo.players[0].position == Position([100.0, 100.0]))
+
+
+  test "simple rotate":
+    let commands = @[
+      Command((name: Name("John"), action: clockwise)),
+      Command((name: Name("Peter"), action: counterclockwise))
+    ]
+    let newstate = update(state, config, 8, commands)
+    check(newstate.players[0].angle =~ Angle(0))
+    check(newstate.players[1].angle =~ Angle(PI))
+
+  test "more interesting rotate":
+    let commands = @[
+      Command((name: Name("John"), action: clockwise)),
+      Command((name: Name("Peter"), action: counterclockwise))
+    ]
+    let newstate = update(state, config, 3, commands)
+    check(newstate.players[0].angle == Angle(-3 * (PI / 4)))
+    check(newstate.players[1].angle == Angle(3 * (PI / 4)))
