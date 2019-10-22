@@ -1,16 +1,7 @@
-
-os:
-  - linux
-dist: trusty
-
-language: c
-
-install:
-  - export CHOOSENIM_CHOOSE_VERSION="0.19.4"
-  - |
-      curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
-      sh init.sh -y
-  - export PATH=$HOME/.nimble/bin:$PATH
-
+sudo: required
+services:
+  - docker
+before_install:
+  - docker pull nimlang/nim
 script:
-  - make test
+  - docker run -v "C:/Users/Asbjørn/git/pure-tanks:/project" -w /project -it nimlang/nim sh -c "apt -install make && make test"
