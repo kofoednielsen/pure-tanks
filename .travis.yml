@@ -4,4 +4,4 @@ services:
 before_install:
   - docker pull nimlang/nim
 script:
-  - docker run -v "C:/Users/Asbjørn/git/pure-tanks:/project" -w "/project" -it nimlang/nim sh -c "apt install make && make test"
+  - docker run -v "C:/Users/Asbjørn/git/pure-tanks:/project" -w "/project" -nimlang/nim sh -c "apt install make && make test"
