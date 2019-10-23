@@ -37,8 +37,6 @@ func move_rotate(info: UpdateInfo, player: Player, coef: float): Player =
   let newangle = player.angle + angledelta
 
   # wrap angle into range [-PI;PI]
-  # (mysterious piece of maths that does what we want)
-  # let wrappedangle = arctan2(sin(newangle), cos(newangle))
   let wrappedangle = wrap_angle(newangle)
   assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
          "Got angle outside range [-PI;PI]")
@@ -72,7 +70,6 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     ## return GameState after applying given Command
     
     # table mapping Actions to move functions
-    # TODO: complete movement functions
     const mvfuncs = {
       forward: move_forward,
       backward: move_backward,
@@ -89,14 +86,14 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     let new_players = map(info.state.players,
                           p => (if p == player: mvfunc(info,p) else: p))
 
-    # assemble and return new game state
+    # assemble game state
     let newstate = GameState(
       players: newplayers,
       projectiles: info.state.projectiles,
       map: info.state.map
     )
     
-    # returns UpdateInfo because it make the fold in `update` more convinient
+    # returns UpdateInfo because it makes the fold in `update` more convinient
     return UpdateInfo(state: newstate,
                       config: info.config,
                       dt: info.dt)
