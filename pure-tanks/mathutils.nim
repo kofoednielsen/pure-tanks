@@ -11,12 +11,17 @@ func `=~` *(x, y: float): bool =
   result = abs(x - y) < eps
 
 
-func move*(position: Position, angle: Angle, distance: float): Position =
+func move*(rect: Rect, distance: float): Rect =
   ## Returns the Position obtained by moving `distance` in direction `angle`
-  return Position([
-    position[0] + (distance * cos(angle)),
-    position[1] + (distance * sin(angle))
-  ])
+  return Rect(
+    angle: rect.angle,
+    width: rect.width,
+    height: rect.height,
+    pos: Position([
+      x: rect.pos.x + (distance * cos(angle)),
+      y: rect.pos.y + (distance * sin(angle))
+    ])
+  )
 
 
 func wrap_angle*(angle: Angle): Angle =
