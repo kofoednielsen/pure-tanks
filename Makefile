@@ -1,7 +1,8 @@
 
-TESTPATHS = $(wildcard tests/*.nim)
-TESTFILES = $(subst tests/,,$(TESTPATHS))
-TESTS = $(subst .nim,,$(TESTFILES))
+# tests/mytest.nim -> mytest
+TESTPATHS = $(wildcard tests/*.nim)        # path to test code
+TESTFILES = $(subst tests/,,$(TESTPATHS))  # basenames of test files
+TESTS = $(subst .nim,,$(TESTFILES))        # strip extension
 
 test: $(TESTS)
 

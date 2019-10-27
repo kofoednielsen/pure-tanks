@@ -14,16 +14,33 @@ func `=~` *(x, y: float): bool =
 func move*(rect: Rect, distance: float): Rect =
   ## Returns the Position obtained by moving `distance` in direction `angle`
   return Rect(
+    pos: Position(
+      x: rect.pos.x + (distance * cos(rect.angle)),
+      y: rect.pos.y + (distance * sin(rect.angle))
+    ),
     angle: rect.angle,
     width: rect.width,
-    height: rect.height,
-    pos: Position([
-      x: rect.pos.x + (distance * cos(angle)),
-      y: rect.pos.y + (distance * sin(angle))
-    ])
+    height: rect.height
   )
 
 
 func wrap_angle*(angle: Angle): Angle =
   ## Wraps an angle to fit in range [-PI;PI]
   return arctan2(sin(angle), cos(angle))
+
+
+func rotate*(rect: Rect, angledelta: float): Rect =
+  ## Rotates a Rect by `angledelta` radians
+  let newangle = rect.angle + angledelta
+
+  # wrap angle into range [-PI;PI]
+  let wrappedangle = wrap_angle(newangle)
+  assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
+         "Got angle outside range [-PI;PI]")
+
+  return Rect(
+    angle: wrappedangle,
+    pos: rect.pos,
+    width: rect.width,
+    height: rect.height
+  )

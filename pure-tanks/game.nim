@@ -10,12 +10,11 @@ func move_linear(info: UpdateInfo, player: Player, coef: float): Player =
                   float(info.dt) *
                   coef)  # direction coefficient
 
-  let newposition = move(player.position, player.angle, distance)
-  return Player(angle: player.angle,
+  let newshape = move(player.shape, distance)
+  return Player(shape: newshape,
                 kills: player.kills,
                 deaths: player.deaths,
-                name: player.name,
-                position: newposition)
+                name: player.name)
 
 
 func move_forward(info: UpdateInfo, player: Player): Player =
@@ -34,18 +33,11 @@ func move_rotate(info: UpdateInfo, player: Player, coef: float): Player =
                     info.config.timemod *
                     float(info.dt) *
                     coef)
-  let newangle = player.angle + angledelta
-
-  # wrap angle into range [-PI;PI]
-  let wrappedangle = wrap_angle(newangle)
-  assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
-         "Got angle outside range [-PI;PI]")
-
-  return Player(angle: wrappedangle,
+  let newshape = rotate(player.shape, angledelta)
+  return Player(shape: newshape,
                 kills: player.kills,
                 deaths: player.deaths,
-                name: player.name,
-                position: player.position)
+                name: player.name)
 
 
 func move_counterclockwise(info: UpdateInfo, player: Player): Player =
