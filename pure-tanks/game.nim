@@ -3,6 +3,7 @@ import sequtils, tables, sugar, math
 # app imports
 import types, mathutils
 
+
 func linear_move_func(direction: int): auto =
   ## Returns a function for moving a player either forwards or backward
   assert(direction in [-1, 1], "Only allowed directions are 1 and -1")
@@ -13,12 +14,11 @@ func linear_move_func(direction: int): auto =
                     float(info.dt) *
                     float(direction))  # direction coefficient
 
-    let newposition = move(player.position, player.angle, distance)
-    return Player(angle: player.angle,
+    let newshape = move(player.shape, distance)
+    return Player(shape: newshape,
                   kills: player.kills,
                   deaths: player.deaths,
-                  name: player.name,
-                  position: newposition)
+                  name: player.name)
 
 
 func rotate_move_func(direction: int): auto =
@@ -29,18 +29,11 @@ func rotate_move_func(direction: int): auto =
                       info.config.timemod *
                       float(info.dt) *
                       float(direction))
-    let newangle = player.angle + angledelta
-
-    # wrap angle into range [-PI;PI]
-    let wrappedangle = wrap_angle(newangle)
-    assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
-           "Got angle outside range [-PI;PI]")
-
-    return Player(angle: wrappedangle,
+    let newshape = rotate(player.shape, angledelta)
+    return Player(shape: newshape,
                   kills: player.kills,
                   deaths: player.deaths,
-                  name: player.name,
-                  position: player.position)
+                  name: player.name)
 
 
 func get_player(info: UpdateInfo, name: Name): Player =

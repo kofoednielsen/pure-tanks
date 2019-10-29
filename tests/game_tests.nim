@@ -1,4 +1,4 @@
-import unittest, strutils, math
+import unittest, math
 import types, game, mathutils
 
 suite "Game logic tests":
@@ -8,15 +8,23 @@ suite "Game logic tests":
       players: @[
         Player(
           name: Name("John"),
-          angle: Angle(0),  #  facing right
-          position: Position([100.0, 100.0]),
+          shape: Rect(
+            angle: Angle(0),  #  facing right
+            pos: Position(x: 100.0, y: 100.0),
+            width: 10,
+            height: 10
+          ),
           kills: 3,
           deaths: 1,
         ),
         Player(
           name: Name("Peter"),
-          angle: Angle(PI),  #  facing left
-          position: Position([200.0, 200.0]),
+          shape: Rect(
+            angle: Angle(PI),  #  facing left
+            pos: Position(x: 200.0, y: 200.0),
+            width: 10,
+            height: 10
+          ),
           kills: 5,
           deaths: 2,
         )
@@ -37,7 +45,7 @@ suite "Game logic tests":
       Command((name: Name("John"), action: backward)),
     ]
     expect(AssertionError):
-      let newstate = update(state, config, 100, commands)
+      discard update(state, config, 100, commands)
   
 
   test "simple move forward":
@@ -46,8 +54,8 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: forward))
     ]
     let newstate = update(state, config, 100, commands)
-    check(newstate.players[0].position == Position([200.0, 100.0]))
-    check(newstate.players[1].position == Position([100.0, 200.0]))
+    check(newstate.players[0].shape.pos == Position(x: 200.0, y: 100.0))
+    check(newstate.players[1].shape.pos == Position(x: 100.0, y: 200.0))
   
 
   test "simple move backward":
@@ -56,17 +64,17 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: backward))
     ]
     let newstate = update(state, config, 100, commands)
-    check(newstate.players[0].position == Position([0.0, 100.0]))
-    check(newstate.players[1].position == Position([300.0, 200.0]))
+    check(newstate.players[0].shape.pos == Position(x: 0.0, y: 100.0))
+    check(newstate.players[1].shape.pos == Position(x: 300.0, y: 200.0))
   
 
   test "simple move forward, then backwards":
     let newstateone = update(state, config, 100,
-                          @[Command((name: Name("John"), action: forward))])
-    check(newstateone.players[0].position == Position([200.0, 100.0]))
+                             @[Command((name: Name("John"), action: forward))])
+    check(newstateone.players[0].shape.pos == Position(x: 200.0, y: 100.0))
     let newstatetwo = update(newstateone, config, 100,
-                          @[Command((name: Name("John"), action: backward))])
-    check(newstatetwo.players[0].position == Position([100.0, 100.0]))
+                             @[Command((name: Name("John"), action: backward))])
+    check(newstatetwo.players[0].shape.pos == Position(x: 100.0, y: 100.0))
 
 
   test "simple rotate":
@@ -75,8 +83,8 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: counterclockwise))
     ]
     let newstate = update(state, config, 8, commands)
-    check(newstate.players[0].angle =~ Angle(0))
-    check(newstate.players[1].angle =~ Angle(PI))
+    check(newstate.players[0].shape.angle =~ Angle(0))
+    check(newstate.players[1].shape.angle =~ Angle(PI))
 
   test "more interesting rotate":
     let commands = @[
@@ -84,5 +92,5 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: counterclockwise))
     ]
     let newstate = update(state, config, 3, commands)
-    check(newstate.players[0].angle =~ Angle(-3 * (PI / 4)))
-    check(newstate.players[1].angle =~ Angle(-PI / 4))
+    check(newstate.players[0].shape.angle =~ Angle(-3 * (PI / 4)))
+    check(newstate.players[1].shape.angle =~ Angle(-PI / 4))

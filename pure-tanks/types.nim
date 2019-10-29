@@ -1,22 +1,23 @@
 type
   Angle* = float  #  radians
-  Position* = array[2, float]
   Name* = string
 
-  Player* = object
-    angle*: Angle
-    position*: Position
-    kills*, deaths*: int
-    name*: Name
-
-  Projectile* = object
-    angle*: Angle
-    position*: Position
-    owner*: Name
+  Position* = object
+    x*, y*: float
 
   Rect* = object
-    position*: Position
-    width, height: int
+    angle*: Angle
+    pos*: Position
+    width*, height*: int
+
+  Player* = object
+    kills*, deaths*: int
+    name*: Name
+    shape*: Rect
+
+  Projectile* = object
+    owner*: Name
+    shape*: Rect
 
   Map* = seq[Rect]
 
