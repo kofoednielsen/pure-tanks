@@ -2,12 +2,15 @@ type
   Angle* = float  #  radians
   Name* = string
 
-  Position* = object
+  Point* = object
     x*, y*: float
+
+  Segment* = object
+    a*, b*: Point
 
   Rect* = object
     angle*: Angle
-    pos*: Position
+    pos*: Point
     width*, height*: int
 
   Player* = object

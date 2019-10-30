@@ -14,13 +14,14 @@ func `=~` *(a, b: float): bool =
 
 func `=~` *(a: Point, b: Point): bool =
   ## Define `=~` operator for approximate point comparisions
-  return (a.x =~ b.x) && (a.y =~ b.y)
+  return (a.x =~ b.x) and (a.y =~ b.y)
 
 
-func `*` *(seg: Segment, k: float): Point =
+func point_at_scalar*(seg: Segment, scalar: float): Point =
+  ## Get the Point at `scalar` on the Segment
   return Point(
-    x: (seg[1].x - seg[0].x) * k,
-    y: (seg[1].y - seg[0].y) * k
+    x: (seg.b.x - seg.a.x) * scalar,
+    y: (seg.b.y - seg.a.y) * scalar
   )
 
 
