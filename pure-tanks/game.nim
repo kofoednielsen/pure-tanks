@@ -3,52 +3,39 @@ import sequtils, tables, sugar, math
 # app imports
 import types, mathutils
 
-func move_linear(info: UpdateInfo, player: Player, coef: float): Player =
-  # Move the player and return the resulting player object
-  let distance = (info.config.movementspeed *
-                  info.config.timemod *
-                  float(info.dt) *
-                  coef)  # direction coefficient
 
-  let newshape = move(player.shape, distance)
-  return Player(shape: newshape,
-                kills: player.kills,
-                deaths: player.deaths,
-                name: player.name)
-
-
-func move_forward(info: UpdateInfo, player: Player): Player =
-  ## Returns player after "forward" move.  
-  return move_linear(info, player, 1.0)
-
-
-func move_backward(info: UpdateInfo, player: Player): Player =
-  ## Returns player after "backward" move. 
-  return move_linear(info, player, -1.0)
-
-
-func move_rotate(info: UpdateInfo, player: Player, coef: float): Player =
-  ## Return the Player after rotating in direction indicated by `coef`
-  let angledelta = (info.config.rotationspeed *
+func linear_move_func(direction: int): auto =
+  ## Returns a function for moving a player either forwards or backward
+  assert(direction in [-1, 1], "Only allowed directions are 1 and -1")
+  return func(info: UpdateInfo, player: Player): Player =
+    # Move the player and return the resulting player object
+    let distance = (info.config.movementspeed *
                     info.config.timemod *
                     float(info.dt) *
-                    coef)
-  let newshape = rotate(player.shape, angledelta)
-  return Player(shape: newshape,
-                kills: player.kills,
-                deaths: player.deaths,
-                name: player.name)
+                    float(direction))  # direction coefficient
+
+    let newshape = move(player.shape, distance)
+    return Player(shape: newshape,
+                  kills: player.kills,
+                  deaths: player.deaths,
+                  name: player.name)
 
 
-func move_counterclockwise(info: UpdateInfo, player: Player): Player =
-  ## Return the Player after rotating counterclockwise
-  return move_rotate(info, player, 1.0)
-
-
-func move_clockwise(info: UpdateInfo, player: Player): Player =
-  ## Return the Player after rotating clockwise
-  return move_rotate(info, player, -1.0)
-
+func rotate_move_func(direction: int): auto =
+  ## Returns a function for rotating a player either clockwise 
+  ## or counterclockwise
+  assert(direction in [-1, 1], "Only allowed directions are 1 and -1")
+  return func(info: UpdateInfo, player: Player): Player =
+    ## Return the Player after rotating in direction indicated by `coef`
+    let angledelta = (info.config.rotationspeed *
+                      info.config.timemod *
+                      float(info.dt) *
+                      float(direction))
+    let newshape = rotate(player.shape, angledelta)
+    return Player(shape: newshape,
+                  kills: player.kills,
+                  deaths: player.deaths,
+                  name: player.name)
 
 
 func get_player(info: UpdateInfo, name: Name): Player =
@@ -62,11 +49,11 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     ## return GameState after applying given Command
     
     # table mapping Actions to move functions
-    const mvfuncs = {
-      forward: move_forward,
-      backward: move_backward,
-      counterclockwise: move_counterclockwise,
-      clockwise: move_clockwise
+    let mvfuncs = {
+      counterclockwise: rotate_move_func(1),
+      clockwise: rotate_move_func(-1),
+      forward: linear_move_func(1),
+      backward: linear_move_func(-1)
     }.toTable
 
     # find the command-issuing player
@@ -75,7 +62,7 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     let mvfunc = mvfuncs[cmd.action]
 
     # apply relevant move function to command-issuing player only
-    let new_players = map(info.state.players,
+    let newplayers = map(info.state.players,
                           p => (if p == player: mvfunc(info,p) else: p))
 
     # assemble game state

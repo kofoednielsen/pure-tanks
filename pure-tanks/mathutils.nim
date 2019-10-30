@@ -5,10 +5,16 @@ import math
 import types
 
 
-func `=~` *(x, y: float): bool =
+
+func `=~` *(a, b: float): bool =
   ## Define `=~` operator for approximate float comparisions
   const eps = 1.0e-7
-  result = abs(x - y) < eps
+  return abs(a - b) < eps
+
+
+func `=~` *(a: Point, b: Point): bool =
+  ## Define `=~` operator for approximate point comparisions
+  return (a.x =~ b.x) && (a.y =~ b.y)
 
 
 func `*` *(seg: Segment, k: float): Point =
