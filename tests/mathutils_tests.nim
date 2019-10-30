@@ -18,7 +18,7 @@ suite "wrap_angle tests":
 suite "rotate tests":
   setup:
     let rect = Rect(
-      pos: Position(x: 0, y: 0),
+      pos: Point(x: 0, y: 0),
       width: 0,
       height: 0,
       angle: 0
@@ -31,3 +31,36 @@ suite "rotate tests":
   test "full rotate":
     let rotated = rotate(rect, 2 * PI)
     check(rotated.angle =~ 0)
+
+
+suite "intersection tests":
+  setup:
+    let intersectingseg1 = Segment(
+      a: Point(x: 0, y: 0),
+      b: Point(x: 2, y: 2)
+    )
+    let intersectingseg2 = Segment(
+      a: Point(x: 0, y: 2),
+      b: Point(x: 2, y: 0)
+    )
+    let parallel1 = Segment(
+      a: Point(x: 0, y: 40),
+      b: Point(x: 5, y: 40)
+    )
+    let parallel2 = Segment(
+      a: Point(x: 0, y: 5),
+      b: Point(x: 50, y: 50)
+    )
+
+  test "simple intersection":
+    let isect = intersection(intersectingseg1,
+                             intersectingseg2)
+    check(isect.get() =~ Point(x: 1, y: 1))
+
+  test "parallels dont intersect":
+    let isect = intersection(parallel1, parallel2)
+    check(isect.is_none())
+
+  test "non-intersecting lines":
+    let isect = intersection(intersectingseg1, parallel1)
+    check(isect.is_none())
