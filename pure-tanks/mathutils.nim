@@ -1,9 +1,10 @@
 # std lib
 import math
+import sugar
+import sequtils
 
 # app imports
 import types
-
 
 
 func `=~` *(a, b: float): bool =
@@ -24,37 +25,46 @@ func point_at_scalar*(seg: Segment, scalar: float): Point =
     y: (seg.b.y - seg.a.y) * scalar
   )
 
-
-func move*(rect: Rect, distance: float): Rect =
-  ## Returns the Rect obtained by moving `distance` in direction `rect.angle`
-  return Rect(
-    pos: Point(
-      x: rect.pos.x + (distance * cos(rect.angle)),
-      y: rect.pos.y + (distance * sin(rect.angle))
-    ),
-    angle: rect.angle,
-    width: rect.width,
-    height: rect.height
+func move*(p: Point, angle: Angle, distance: float): Point =
+  ## The Point obtained by moving `distance` in direction `angle`
+  Point(
+    x: p.x + (distance * cos(angle)),
+    y: p.y + (distance * sin(angle))
   )
 
+func move*(poly: Polygon, distance: float): Polygon =
+  ## The Polygon obtained by moving `distance` in  `poly.angle`
+
+  # function to use on Points for this move
+  let thismove = proc(p: Point): Point = move(p, poly.angle, distance)
+
+  # move all the stuff
+  let newcenter = thismove(poly.center)
+  let newsegments = map(poly.segments,
+                        seg => Segment(a: thismove(seg.a),
+                                       b: thismove(seg.b)))
+  return Polygon(
+    center: newcenter,
+    angle: poly.angle,
+    segments: newsegments
+  )
 
 func wrap_angle*(angle: Angle): Angle =
   ## Wraps an angle to fit in range [-PI;PI]
   return arctan2(sin(angle), cos(angle))
 
 
-func rotate*(rect: Rect, angledelta: float): Rect =
+func rotate*(poly: Polygon, angledelta: float): Polygon =
   ## Rotates a Rect by `angledelta` radians
-  let newangle = rect.angle + angledelta
+  let newangle = poly.angle + angledelta
 
   # wrap angle into range [-PI;PI]
   let wrappedangle = wrap_angle(newangle)
   assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
          "Got angle outside range [-PI;PI]")
 
-  return Rect(
+  return Polygon(
     angle: wrappedangle,
-    pos: rect.pos,
-    width: rect.width,
-    height: rect.height
+    center: poly.center,
+    segments: poly.segments
   )

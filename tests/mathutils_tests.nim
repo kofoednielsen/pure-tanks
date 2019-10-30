@@ -17,19 +17,18 @@ suite "wrap_angle tests":
 
 suite "rotate tests":
   setup:
-    let rect = Rect(
-      pos: Point(x: 0, y: 0),
-      width: 0,
-      height: 0,
-      angle: 0
+    let poly = Polygon(
+      center: Point(x: 0, y: 0),
+      angle: 0,
+      segments: @[]
     )
 
   test "quarter rotate":
-    let rotated = rotate(rect, PI / 2)
+    let rotated = rotate(poly, PI / 2)
     check(rotated.angle =~ Angle(PI / 2))
 
   test "full rotate":
-    let rotated = rotate(rect, 2 * PI)
+    let rotated = rotate(poly, 2 * PI)
     check(rotated.angle =~ 0)
 
 

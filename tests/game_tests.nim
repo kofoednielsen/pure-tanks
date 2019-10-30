@@ -8,22 +8,20 @@ suite "Game logic tests":
       players: @[
         Player(
           name: Name("John"),
-          shape: Rect(
+          shape: Polygon(
             angle: Angle(0),  #  facing right
-            pos: Point(x: 100.0, y: 100.0),
-            width: 10,
-            height: 10
+            center: Point(x: 100.0, y: 100.0),
+            segments: @[]
           ),
           kills: 3,
           deaths: 1,
         ),
         Player(
           name: Name("Peter"),
-          shape: Rect(
+          shape: Polygon(
             angle: Angle(PI),  #  facing left
-            pos: Point(x: 200.0, y: 200.0),
-            width: 10,
-            height: 10
+            center: Point(x: 200.0, y: 200.0),
+            segments: @[]
           ),
           kills: 5,
           deaths: 2,
@@ -54,8 +52,8 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: forward))
     ]
     let newstate = update(state, config, 100, commands)
-    check(newstate.players[0].shape.pos == Point(x: 200.0, y: 100.0))
-    check(newstate.players[1].shape.pos == Point(x: 100.0, y: 200.0))
+    check(newstate.players[0].shape.center == Point(x: 200.0, y: 100.0))
+    check(newstate.players[1].shape.center == Point(x: 100.0, y: 200.0))
   
 
   test "simple move backward":
@@ -64,17 +62,17 @@ suite "Game logic tests":
       Command((name: Name("Peter"), action: backward))
     ]
     let newstate = update(state, config, 100, commands)
-    check(newstate.players[0].shape.pos == Point(x: 0.0, y: 100.0))
-    check(newstate.players[1].shape.pos == Point(x: 300.0, y: 200.0))
+    check(newstate.players[0].shape.center == Point(x: 0.0, y: 100.0))
+    check(newstate.players[1].shape.center == Point(x: 300.0, y: 200.0))
   
 
   test "simple move forward, then backwards":
     let newstateone = update(state, config, 100,
                              @[Command((name: Name("John"), action: forward))])
-    check(newstateone.players[0].shape.pos == Point(x: 200.0, y: 100.0))
+    check(newstateone.players[0].shape.center == Point(x: 200.0, y: 100.0))
     let newstatetwo = update(newstateone, config, 100,
                              @[Command((name: Name("John"), action: backward))])
-    check(newstatetwo.players[0].shape.pos == Point(x: 100.0, y: 100.0))
+    check(newstatetwo.players[0].shape.center == Point(x: 100.0, y: 100.0))
 
 
   test "simple rotate":

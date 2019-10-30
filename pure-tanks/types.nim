@@ -10,6 +10,7 @@ type
 
   Polygon* = object
     center*: Point
+    angle*: Angle
     segments*: seq[Segment]
 
 
