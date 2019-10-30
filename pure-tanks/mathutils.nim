@@ -20,10 +20,6 @@ func `=~` *(a: Point, b: Point): bool =
 
 func point_at_scalar*(seg: Segment, scalar: float): Point =
   ## Get the Point at `scalar` on the Segment
-  return Point(
-    x: (seg.b.x - seg.a.x) * scalar,
-    y: (seg.b.y - seg.a.y) * scalar
-  )
 
 func move*(p: Point, angle: Angle, distance: float): Point =
   ## The Point obtained by moving `distance` in direction `angle`
@@ -68,3 +64,31 @@ func rotate*(poly: Polygon, angledelta: float): Polygon =
     center: poly.center,
     segments: poly.segments
   )
+
+  func intersection(sega, segb: Segment): Option[Point]
+    ## Get Point of intersection, between two segments 
+    ## Returns None if no interaction was found
+    
+    # Solution to intersection between two line segments
+    # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html
+    let ascal = ((segb.a.y - segb.b.y) * (sega.a.x - segb.a.x) +
+                 (segb.b.x - segb.a.x) * (sega.a.y - segb.a.y)) /
+                ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
+                 (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
+    let bscal = ((sega.a.y - sega.b.y) * (sega.a.x - segb.a.x) +
+                 (sega.b.x - sega.a.x) * (sega.a.y - segb.a.y)) /
+                ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
+                 (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
+
+    # Check if solution is within the bound of the line segment
+    if 0 <= ascal <= 1 and 0 <= bscal <= 1:
+      # Multiply line segment by scalar to get the point of intersection.
+      # Doesn't matter if use `sega` or `segb`, as the intersection point
+      # is the exact same.
+      return Some(Point(
+        x: (sega.b.x - sega.a.x) * ascal,
+        y: (sega.b.y - sega.a.y) * ascal
+      ))
+    else:
+      return None
+

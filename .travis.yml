@@ -4,4 +4,4 @@ services:
 before_install:
   - docker pull nimlang/nim
 script:
-  - docker run -v "$(pwd):/project" -w "/project" -t nimlang/nim sh -c "apt-get -qq install make && make test"
+  - docker run -v "$(pwd):/project" -w "/project" -t nimlang/nim sh -c "apt-get -qq install make && make test > /proc/1/fd/1"
