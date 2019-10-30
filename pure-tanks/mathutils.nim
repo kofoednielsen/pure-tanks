@@ -11,10 +11,17 @@ func `=~` *(x, y: float): bool =
   result = abs(x - y) < eps
 
 
+func `*` *(seg: Segment, k: float): Point =
+  return Point(
+    x: (seg[1].x - seg[0].x) * k,
+    y: (seg[1].y - seg[0].y) * k
+  )
+
+
 func move*(rect: Rect, distance: float): Rect =
-  ## Returns the Position obtained by moving `distance` in direction `angle`
+  ## Returns the Rect obtained by moving `distance` in direction `rect.angle`
   return Rect(
-    pos: Position(
+    pos: Point(
       x: rect.pos.x + (distance * cos(rect.angle)),
       y: rect.pos.y + (distance * sin(rect.angle))
     ),
