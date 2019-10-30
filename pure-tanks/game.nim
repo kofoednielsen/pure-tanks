@@ -22,6 +22,8 @@ func linear_move_func(direction: int): auto =
 
 
 func rotate_move_func(direction: int): auto =
+  ## Returns a function for rotating a player either clockwise 
+  ## or counterclockwise
   assert(direction in [-1, 1], "Only allowed directions are 1 and -1")
   return func(info: UpdateInfo, player: Player): Player =
     ## Return the Player after rotating in direction indicated by `coef`
@@ -60,7 +62,7 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     let mvfunc = mvfuncs[cmd.action]
 
     # apply relevant move function to command-issuing player only
-    let new_players = map(info.state.players,
+    let newplayers = map(info.state.players,
                           p => (if p == player: mvfunc(info,p) else: p))
 
     # assemble game state
