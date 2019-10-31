@@ -7,8 +7,8 @@ TESTS = $(subst .nim,,$(TESTFILES))        # strip extension
 test: $(TESTS)
 	# run tests
 	set -e; \
-	for file in $^; do \
-		./build/$${file}; \
+	for test in $^; do \
+		./build/$${test}; \
 	done;
 
 $(TESTS):
