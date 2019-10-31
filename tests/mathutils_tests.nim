@@ -1,5 +1,5 @@
 # std imports
-import unittest, strutils, math
+import unittest, strutils, math, options
 
 # app imports
 import mathutils, types

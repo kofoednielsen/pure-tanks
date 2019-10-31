@@ -1,7 +1,8 @@
 # std lib
 import math
-import sugar
+import options
 import sequtils
+import sugar
 
 # app imports
 import types
@@ -65,30 +66,30 @@ func rotate*(poly: Polygon, angledelta: float): Polygon =
     segments: poly.segments
   )
 
-  func intersection(sega, segb: Segment): Option[Point]
-    ## Get Point of intersection, between two segments 
-    ## Returns None if no interaction was found
-    
-    # Solution to intersection between two line segments
-    # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html
-    let ascal = ((segb.a.y - segb.b.y) * (sega.a.x - segb.a.x) +
-                 (segb.b.x - segb.a.x) * (sega.a.y - segb.a.y)) /
-                ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
-                 (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
-    let bscal = ((sega.a.y - sega.b.y) * (sega.a.x - segb.a.x) +
-                 (sega.b.x - sega.a.x) * (sega.a.y - segb.a.y)) /
-                ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
-                 (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
 
-    # Check if solution is within the bound of the line segment
-    if 0 <= ascal <= 1 and 0 <= bscal <= 1:
-      # Multiply line segment by scalar to get the point of intersection.
-      # Doesn't matter if use `sega` or `segb`, as the intersection point
-      # is the exact same.
-      return Some(Point(
-        x: (sega.b.x - sega.a.x) * ascal,
-        y: (sega.b.y - sega.a.y) * ascal
-      ))
-    else:
-      return None
+func intersection*(sega, segb: Segment): Option[Point] =
+  ## Get Point of intersection, between two segments 
+  ## Returns None if no interaction was found
+  
+  # Solution to intersection between two line segments
+  # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html
+  let ascal = ((segb.a.y - segb.b.y) * (sega.a.x - segb.a.x) +
+               (segb.b.x - segb.a.x) * (sega.a.y - segb.a.y)) /
+              ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
+               (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
+  let bscal = ((sega.a.y - sega.b.y) * (sega.a.x - segb.a.x) +
+               (sega.b.x - sega.a.x) * (sega.a.y - segb.a.y)) /
+              ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
+               (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
 
+  # Check if solution is within the bounds of the line segments
+  if (0 <= ascal and ascal <= 1) and (0 <= bscal and bscal <= 1):
+    # Multiply line segment by scalar to get the point of intersection.
+    # Doesn't matter if use `sega` or `segb`, as the intersection point
+    # is the exact same.
+    return some(Point(
+      x: (sega.b.x - sega.a.x) * ascal,
+      y: (sega.b.y - sega.a.y) * ascal
+    ))
+  else:
+    return none(Point)
