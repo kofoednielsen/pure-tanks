@@ -5,6 +5,9 @@ type
   Point* = object
     x*, y*: float
 
+  Vector* = object
+    x*, y*: float
+
   Segment* = object
     a*, b*: Point
 

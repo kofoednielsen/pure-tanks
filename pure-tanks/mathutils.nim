@@ -14,13 +14,15 @@ func `=~` *(a, b: float): bool =
   return abs(a - b) < eps
 
 
-func `=~` *(a: Point, b: Point): bool =
+func `=~` *(a, b: Point): bool =
   ## Define `=~` operator for approximate point comparisions
-  return (a.x =~ b.x) and (a.y =~ b.y)
+  (a.x =~ b.x) and (a.y =~ b.y)
 
 
-func point_at_scalar*(seg: Segment, scalar: float): Point =
-  ## Get the Point at `scalar` on the Segment
+func translate(p: Point, v: Vector): Point =
+  ## Translate Point `p` by Vector `v`
+  Point(x: p.x + v.x, y: p.y + v.y)
+
 
 func move*(p: Point, angle: Angle, distance: float): Point =
   ## The Point obtained by moving `distance` in direction `angle`
@@ -29,11 +31,12 @@ func move*(p: Point, angle: Angle, distance: float): Point =
     y: p.y + (distance * sin(angle))
   )
 
+
 func move*(poly: Polygon, distance: float): Polygon =
   ## The Polygon obtained by moving `distance` in  `poly.angle`
 
   # function to use on Points for this move
-  let thismove = proc(p: Point): Point = move(p, poly.angle, distance)
+  let thismove = func(p: Point): Point = move(p, poly.angle, distance)
 
   # move all the stuff
   let newcenter = thismove(poly.center)
@@ -46,24 +49,42 @@ func move*(poly: Polygon, distance: float): Polygon =
     segments: newsegments
   )
 
+
 func wrap_angle*(angle: Angle): Angle =
   ## Wraps an angle to fit in range [-PI;PI]
-  return arctan2(sin(angle), cos(angle))
+  arctan2(sin(angle), cos(angle))
 
 
-func rotate*(poly: Polygon, angledelta: float): Polygon =
-  ## Rotates a Rect by `angledelta` radians
-  let newangle = poly.angle + angledelta
+func rotate*(p: Point, c: Point, delta: Angle): Point =
+  ## Rotates a Point around center `c` by `delta` degrees
+  # shift p so that rotate center is at origin
+  # (translate by vector spanning c -> origo)
+  let po = translate(p, Vector(x: -c.x, y: -c.y))
+  # rotate around origin
+  let rotated = Point(
+    x: (po.x * cos(delta)) - (po.y * sin(delta)),
+    y: (po.y * cos(delta)) - (po.y * sin(delta)),
+  )
+  # shift back to original placement
+  let newp = translate(rotated, Vector(x: c.x, y: c.y))
+  return newp
 
-  # wrap angle into range [-PI;PI]
-  let wrappedangle = wrap_angle(newangle)
-  assert((-1 * PI) <= wrappedangle and wrappedangle <= PI,
+
+func rotate*(poly: Polygon, delta: Angle): Polygon =
+  ## Rotates a Polygon by `angledelta` radians
+  # rotate angle, keeping in range [-PI;PI]
+  let newangle = wrap_angle(poly.angle + delta)
+  assert((-1 * PI) <= newangle and newangle <= PI,
          "Got angle outside range [-PI;PI]")
-
+  # rotate all segments
+  let thisrotation = func(p: Point): Point = rotate(p, poly.center, delta)
+  let newsegments = map(poly.segments,
+                        s => Segment(a: thisrotation(s.a),
+                                     b: thisrotation(s.b)))
   return Polygon(
-    angle: wrappedangle,
-    center: poly.center,
-    segments: poly.segments
+    angle: newangle,
+    segments: newsegments,
+    center: poly.center
   )
 
 

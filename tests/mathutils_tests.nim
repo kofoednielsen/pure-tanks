@@ -22,14 +22,25 @@ suite "rotate tests":
       angle: 0,
       segments: @[]
     )
+    let firstquadrantpoint = Point(x: 1, y: 1)
 
-  test "quarter rotate":
+  test "quarter rotate polygon - check angle":
     let rotated = rotate(poly, PI / 2)
     check(rotated.angle =~ Angle(PI / 2))
 
-  test "full rotate":
+  test "full rotate polygon - check angle":
     let rotated = rotate(poly, 2 * PI)
     check(rotated.angle =~ 0)
+
+  test "rotate point PI radians around origin":
+    let rotated = rotate(firstquadrantpoint,
+                         Point(x: 0, y: 0), PI)
+    check(rotated =~ Point(x: -1, y: -1))
+
+  test "rotate point PI radians around (2,2)":
+    let rotated = rotate(firstquadrantpoint,
+                         Point(x: 2, y: 2), PI)
+    check(rotated =~ Point(x: 3, y: 3))
 
 
 suite "intersection tests":
