@@ -26,22 +26,21 @@ func translate(p: Point, v: Vector): Point =
 
 func move*(poly: Polygon, distance: float): Polygon =
   ## The Polygon obtained by moving `distance` in  `poly.angle`
-
-  # function to use on Points for this move
-  # let thismove = func(p: Point): Point = move(p, poly.angle, distance)
+  
+  # define this movement as a function
   let movementvector = Vector(x: cos(poly.angle) * distance,
                               y: sin(poly.angle) * distance)
   let thismove = func(p: Point): Point = translate(p, movementvector)
 
-  # move all the stuff
+  # apply movement to all the stuff
   let newcenter = thismove(poly.center)
   let newsegments = map(poly.segments,
                         seg => Segment(a: thismove(seg.a),
                                        b: thismove(seg.b)))
   return Polygon(
     center: newcenter,
-    angle: poly.angle,
-    segments: newsegments
+    segments: newsegments,
+    angle: poly.angle
   )
 
 
