@@ -24,19 +24,14 @@ func translate(p: Point, v: Vector): Point =
   Point(x: p.x + v.x, y: p.y + v.y)
 
 
-func move*(p: Point, angle: Angle, distance: float): Point =
-  ## The Point obtained by moving `distance` in direction `angle`
-  Point(
-    x: p.x + (distance * cos(angle)),
-    y: p.y + (distance * sin(angle))
-  )
-
-
 func move*(poly: Polygon, distance: float): Polygon =
   ## The Polygon obtained by moving `distance` in  `poly.angle`
 
   # function to use on Points for this move
-  let thismove = func(p: Point): Point = move(p, poly.angle, distance)
+  # let thismove = func(p: Point): Point = move(p, poly.angle, distance)
+  let movementvector = Vector(x: cos(poly.angle) * distance,
+                              y: sin(poly.angle) * distance)
+  let thismove = func(p: Point): Point = translate(p, movementvector)
 
   # move all the stuff
   let newcenter = thismove(poly.center)
@@ -56,7 +51,7 @@ func wrap_angle*(angle: Angle): Angle =
 
 
 func rotate*(p: Point, c: Point, delta: Angle): Point =
-  ## Rotates a Point around center `c` by `delta` degrees
+  ## Rotates a Point around center `c` by `delta` radians
   # shift p so that rotate center is at origin
   # (translate by vector spanning c -> origo)
   let po = translate(p, Vector(x: -c.x, y: -c.y))
@@ -71,7 +66,7 @@ func rotate*(p: Point, c: Point, delta: Angle): Point =
 
 
 func rotate*(poly: Polygon, delta: Angle): Polygon =
-  ## Rotates a Polygon by `angledelta` radians
+  ## Rotates a Polygon by `delta` radians
   # rotate angle, keeping in range [-PI;PI]
   let newangle = wrap_angle(poly.angle + delta)
   assert((-1 * PI) <= newangle and newangle <= PI,
