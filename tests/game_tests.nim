@@ -3,32 +3,55 @@ import types, game, mathutils
 
 suite "Game logic tests":
   setup:
+    # 100x100 square, centered at (100, 100), facing right
+    let hundredsquare = Polygon(
+      angle: Angle(0),
+      center: Point(x: 100, y: 100),
+      segments: @[
+        Segment(a: Point(x: 50, y: 50),    # (50, 50)    (150, 50)
+                b: Point(x: 150, y: 50)),  #      +---------+
+        Segment(a: Point(x: 150, y: 50),   #      |         |
+                b: Point(x: 150, y: 150)), #      |  (100,  |
+        Segment(a: Point(x: 150, y: 150),  #      |   100)  |
+                b: Point(x: 50, y: 150)),  #      |         |
+        Segment(a: Point(x: 50, y: 150),   #      +---------+
+                b: Point(x: 50, y: 50))    # (50, 150)   (150, 150)
+      ]
+    )
+    let john = Player(
+      name: Name("John"),
+      shape: hundredsquare,
+      kills: 3,
+      deaths: 1
+    )
+
+    let peter = Player(
+      name: Name("Peter"),
+      shape: Polygon(
+        angle: Angle(PI),  #  facing left
+        center: Point(x: 200.0, y: 200.0),
+        segments: @[]
+      ),
+      kills: 5,
+      deaths: 2
+    )
+
+    # 100x100 square, centered at (300, 100)
+    # (leftmost points are x=250, y=50..150)
+    let hundredsquaremoved = move(hundredsquare, 200)
+    let johnblocker = Player(
+      name: Name("JohnBlocker"),
+      shape: hundredsquaremoved,
+      kills: 1337,
+      deaths: 0
+    )
+
     let state = GameState(
       projectiles: @[],
-      players: @[
-        Player(
-          name: Name("John"),
-          shape: Polygon(
-            angle: Angle(0),  #  facing right
-            center: Point(x: 100.0, y: 100.0),
-            segments: @[]
-          ),
-          kills: 3,
-          deaths: 1,
-        ),
-        Player(
-          name: Name("Peter"),
-          shape: Polygon(
-            angle: Angle(PI),  #  facing left
-            center: Point(x: 200.0, y: 200.0),
-            segments: @[]
-          ),
-          kills: 5,
-          deaths: 2,
-        )
-      ],
+      players: @[john, peter, johnblocker],
       map: Map(@[])
     )
+
     let config = Config(
       timemod: 1,
       movementspeed: 1,
@@ -84,6 +107,7 @@ suite "Game logic tests":
     check(newstate.players[0].shape.angle =~ Angle(0))
     check(newstate.players[1].shape.angle =~ Angle(PI))
 
+
   test "more interesting rotate":
     let commands = @[
       Command((name: Name("John"), action: clockwise)),
@@ -92,3 +116,10 @@ suite "Game logic tests":
     let newstate = update(state, config, 3, commands)
     check(newstate.players[0].shape.angle =~ Angle(-3 * (PI / 4)))
     check(newstate.players[1].shape.angle =~ Angle(-PI / 4))
+
+
+  test "blocked move":
+    let movecmd = Command((name: Name("John"), action: forward))
+    let newstate = update(state, config, 1000, @[movecmd])
+    let movedjohn = newstate.players[0]
+    check(movedjohn.shape.center =~ Point(x: 200, y: 100))
