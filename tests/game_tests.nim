@@ -36,12 +36,25 @@ suite "Game logic tests":
       deaths: 2
     )
 
+    let blockingsquare = Polygon(
+      angle: Angle(0),
+      center: Point(x: 200, y: 150),
+      segments: @[
+        Segment(a: Point(x: 250, y: 100),  # (250, 100)   (350, 100)
+                b: Point(x: 350, y: 100)), #      +---------+
+        Segment(a: Point(x: 350, y: 100),  #      |         |
+                b: Point(x: 350, y: 200)), #      |  (200,  |
+        Segment(a: Point(x: 350, y: 200),  #      |   150)  |
+                b: Point(x: 250, y: 200)), #      |         |
+        Segment(a: Point(x: 250, y: 200),  #      +---------+
+                b: Point(x: 250, y: 100))  # (250, 200)   (350, 200)
+      ]
+    )
     # 100x100 square, centered at (300, 100)
     # (leftmost points are x=250, y=50..150)
-    let hundredsquaremoved = move(hundredsquare, 200)
     let johnblocker = Player(
       name: Name("JohnBlocker"),
-      shape: hundredsquaremoved,
+      shape: blockingsquare,
       kills: 1337,
       deaths: 0
     )
@@ -122,4 +135,4 @@ suite "Game logic tests":
     let movecmd = Command((name: Name("John"), action: forward))
     let newstate = update(state, config, 1000, @[movecmd])
     let movedjohn = newstate.players[0]
-    check(movedjohn.shape.center =~ Point(x: 200, y: 100))
+    check(movedjohn.shape.center == Point(x: 200, y: 100))

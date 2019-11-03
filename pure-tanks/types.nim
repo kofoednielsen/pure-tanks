@@ -33,20 +33,6 @@ type
   Box* = object
     shape*: Polygon
 
-  CollidableKind* = enum
-    PlayerKind,
-    ProjectileKind,
-    BoxKind
-  Collidable* = object
-    segment*: Segment
-    case kind*: CollidableKind
-    of PlayerKind:
-      player*: Player
-    of ProjectileKind:
-      projectile*: Projectile
-    of BoxKind:
-      box*: Box
-
   Map* = seq[Box]
 
   GameState* = object

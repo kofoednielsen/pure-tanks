@@ -3,6 +3,33 @@ import sequtils, tables, sugar, math, options
 # app imports
 import types, mathutils
 
+# type used to represent possible collisions when moving
+type
+  CollidableKind = enum
+    PlayerKind,
+    ProjectileKind,
+    BoxKind
+
+  Collidable = object
+    case kind: CollidableKind
+    of PlayerKind:
+      player: Player
+    of ProjectileKind:
+      projectile: Projectile
+    of BoxKind:
+      box: Box
+    segment: Segment
+
+  CollOption = tuple[collidable: Collidable,
+                        startp: Point,
+                        collp: Option[Point]]
+
+
+func `<`(a, b: CollOption): bool =
+  ## Compares CollOptions (in order to easily find minimum)
+  (len(Segment(a: a.startp, b: a.collp.get())) <
+   len(Segment(a: b.startp, b: b.collp.get())))
+
 
 func collision_points(config: Config, seg: Segment): seq[Point] =
   ## Get collision Points on Segment
@@ -37,9 +64,7 @@ func linear_move_func(direction: int): auto =
     # movement lines for each collision point
     let movesegs = collpoints.map(p => Segment(a: p, b: p.translate(idealvec)))
 
-    # get Segments of all Collidables (except currently moving Player)
-    # and wrap the actual Collidable type in a Collidable variant object
-    # results in a seq[seq[seq[Segment], Collidable]]
+    # make Collidables of all game objects (except currently moving Player)
     let otherplayers = info.state.players.filter(p => p != player)
     let
       playercolls: seq[Collidable] = otherplayers.map(
@@ -56,30 +81,22 @@ func linear_move_func(direction: int): auto =
                                                    segment: s))).concat().concat()
     let collidables: seq[Collidable] = playercolls & projectilecolls & boxcolls
 
-    type CollOption = tuple[collidable: Collidable,
-                            startp: Point,
-                            collp: Option[Point]]
-
+    # wtf
     let colloptions: seq[CollOption] = map(movesegs,
       ms => map(collidables,
         coll => (collidable: coll,
                  startp: ms.a,
                  collp: intersection(coll.segment, ms)))).concat().concat()
-
+    # i give up
     let collisions: seq[CollOption] = colloptions.filter(co => co.collp.is_some())
 
-    func `<`(a, b: CollOption): bool =
-      ## Compares CollOptions (in order to find minimum)
-      (len(Segment(a: a.startp, b: a.collp.get())) <
-       len(Segment(a: b.startp, b: b.collp.get())))
-
+    # end me
     let mvdist = func(): float =
-      if 0 < len(collisions):
-        let closest = min(collisions)
-        return Segment(a: closest.startp,
-                       b: closest.collp.get()).len()
-      else:
+      if len(collisions) == 0:
         return distance
+      let closest = min(collisions)
+      return Segment(a: closest.startp,
+                     b: closest.collp.get()).len()
 
     let newshape = move(player.shape, mvdist())
     return Player(shape: newshape,
@@ -117,11 +134,11 @@ func apply_command(info: UpdateInfo, cmd: Command): UpdateInfo =
     
     # table mapping Actions to move functions
     let mvfuncs = {
-      counterclockwise: rotate_move_func(1),
-      clockwise: rotate_move_func(-1),
       forward: linear_move_func(1),
-      backward: linear_move_func(-1)
-    }.toTable
+      backward: linear_move_func(-1),
+      counterclockwise: rotate_move_func(1),
+      clockwise: rotate_move_func(-1)
+    }.to_table
 
     # find the command-issuing player
     let player = info.get_player(cmd.name)
