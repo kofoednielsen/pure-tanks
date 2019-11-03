@@ -34,9 +34,8 @@ func move*(poly: Polygon, distance: float): Polygon =
 
   # apply movement to all the stuff
   let newcenter = thismove(poly.center)
-  let newsegments = map(poly.segments,
-                        seg => Segment(a: thismove(seg.a),
-                                       b: thismove(seg.b)))
+  let newsegments = map(poly.segments, seg => Segment(a: thismove(seg.a),
+                                                      b: thismove(seg.b)))
   return Polygon(
     center: newcenter,
     segments: newsegments,
@@ -70,11 +69,12 @@ func rotate*(poly: Polygon, delta: Angle): Polygon =
   let newangle = wrap_angle(poly.angle + delta)
   assert((-1 * PI) <= newangle and newangle <= PI,
          "Got angle outside range [-PI;PI]")
+
+  # make function for rotating with delta around center.
+  let rotated = func(p: Point): Point = rotate(p, poly.center, delta)
   # rotate all segments
-  let thisrotation = func(p: Point): Point = rotate(p, poly.center, delta)
-  let newsegments = map(poly.segments,
-                        s => Segment(a: thisrotation(s.a),
-                                     b: thisrotation(s.b)))
+  let newsegments = map(poly.segments, seg => Segment(a: rotated(seg.a),
+                                                      b: rotated(seg.b)))
   return Polygon(
     angle: newangle,
     segments: newsegments,
@@ -83,10 +83,10 @@ func rotate*(poly: Polygon, delta: Angle): Polygon =
 
 
 func intersection*(sega, segb: Segment): Option[Point] =
-  ## Get Point of intersection, between two segments 
-  ## Returns None if no interaction was found
+  ## Get Point of intersection, between two segments,
+  ## returns None if no interaction was found
   
-  # Solution to intersection between two line segments
+  # solution to intersection between two line segments
   # http://www.cs.swan.ac.uk/~cssimon/line_intersection.html
   let ascal = ((segb.a.y - segb.b.y) * (sega.a.x - segb.a.x) +
                (segb.b.x - segb.a.x) * (sega.a.y - segb.a.y)) /
@@ -97,10 +97,10 @@ func intersection*(sega, segb: Segment): Option[Point] =
               ((segb.b.x - segb.a.x) * (sega.a.y - sega.b.y) -
                (sega.a.x - sega.b.x) * (segb.b.y - segb.a.y))
 
-  # Check if solution is within the bounds of the line segments
+  # check if solution is within the bounds of the line segments
   if (0 <= ascal and ascal <= 1) and (0 <= bscal and bscal <= 1):
-    # Multiply line segment by scalar to get the point of intersection.
-    # Doesn't matter if use `sega` or `segb`, as the intersection point
+    # dultiply line segment by scalar to get the point of intersection.
+    # doesn't matter if use `sega` or `segb`, as the intersection point
     # is the exact same.
     return some(Point(
       x: (sega.b.x - sega.a.x) * ascal,
