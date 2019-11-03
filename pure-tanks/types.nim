@@ -30,7 +30,24 @@ type
     owner*: Name
     shape*: Polygon
 
-  Map* = seq[Polygon]
+  Box* = object
+    shape*: Polygon
+
+  CollidableKind* = enum
+    PlayerKind,
+    ProjectileKind,
+    BoxKind
+  Collidable* = object
+    segment*: Segment
+    case kind*: CollidableKind
+    of PlayerKind:
+      player*: Player
+    of ProjectileKind:
+      projectile*: Projectile
+    of BoxKind:
+      box*: Box
+
+  Map* = seq[Box]
 
   GameState* = object
     projectiles*: seq[Projectile]
@@ -58,6 +75,7 @@ type
     rotationspeed*: float    #  radians/microseconds [-PI;PI]
     movementspeed*: float    #  distance/microseconds
     projectilespeed*: float  #  distance/microseconds
+    collisionpointdist*: float # distance between collision points on a segment
 
   UpdateInfo* = object
     state*: GameState

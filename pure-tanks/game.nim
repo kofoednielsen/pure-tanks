@@ -1,7 +1,21 @@
 # std lib
-import sequtils, tables, sugar, math
+import sequtils, tables, sugar, math, options
 # app imports
 import types, mathutils
+
+
+func collision_points(config: Config, seg: Segment): seq[Point] =
+  ## Get collision Points on Segment
+  let dist = config.collisionpointdist
+  let length = len(seg)
+  let npoints = int(length/dist)
+  let scalars = to_seq(0..npoints).map(i => float(i) * dist / length)
+  return map(scalars, s => point_at_scalar(seg, s))
+
+
+func collision_points(config: Config, poly: Polygon): seq[Point] =
+  ## Get collision Points on surface of Polygon
+  poly.segments.map(seg => collision_points(config, seg)).concat()
 
 
 func linear_move_func(direction: int): auto =
@@ -14,7 +28,60 @@ func linear_move_func(direction: int): auto =
                     float(info.dt) *
                     float(direction))  # direction coefficient
 
-    let newshape = move(player.shape, distance)
+    # ideal movement vector (if we don't collide, do this)
+    let idealvec = to_vector(player.shape.angle, distance)
+
+    # colliding points on Polygon
+    let collpoints = collision_points(info.config, player.shape)
+
+    # movement lines for each collision point
+    let movesegs = collpoints.map(p => Segment(a: p, b: p.translate(idealvec)))
+
+    # get Segments of all Collidables (except currently moving Player)
+    # and wrap the actual Collidable type in a Collidable variant object
+    # results in a seq[seq[seq[Segment], Collidable]]
+    let otherplayers = info.state.players.filter(p => p != player)
+    let
+      playercolls: seq[Collidable] = otherplayers.map(
+        p => map(p.shape.segments, s => Collidable(kind: PlayerKind,
+                                                   player: p,
+                                                   segment: s))).concat().concat()
+      projectilecolls: seq[Collidable] = info.state.projectiles.map(
+        p => map(p.shape.segments, s => Collidable(kind: ProjectileKind,
+                                                   projectile: p,
+                                                   segment: s))).concat().concat()
+      boxcolls: seq[Collidable] = info.state.map.map(
+        b => map(b.shape.segments, s => Collidable(kind: BoxKind,
+                                                   box: b,
+                                                   segment: s))).concat().concat()
+    let collidables: seq[Collidable] = playercolls & projectilecolls & boxcolls
+
+    type CollOption = tuple[collidable: Collidable,
+                            startp: Point,
+                            collp: Option[Point]]
+
+    let colloptions: seq[CollOption] = map(movesegs,
+      ms => map(collidables,
+        coll => (collidable: coll,
+                 startp: ms.a,
+                 collp: intersection(coll.segment, ms)))).concat().concat()
+
+    let collisions: seq[CollOption] = colloptions.filter(co => co.collp.is_some())
+
+    func `<`(a, b: CollOption): bool =
+      ## Compares CollOptions (in order to find minimum)
+      (len(Segment(a: a.startp, b: a.collp.get())) <
+       len(Segment(a: b.startp, b: b.collp.get())))
+
+    let mvdist = func(): float =
+      if 0 < len(collisions):
+        let closest = min(collisions)
+        return Segment(a: closest.startp,
+                       b: closest.collp.get()).len()
+      else:
+        return distance
+
+    let newshape = move(player.shape, mvdist())
     return Player(shape: newshape,
                   kills: player.kills,
                   deaths: player.deaths,

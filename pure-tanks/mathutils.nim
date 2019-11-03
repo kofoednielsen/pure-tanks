@@ -19,7 +19,13 @@ func `=~` *(a, b: Point): bool =
   (a.x =~ b.x) and (a.y =~ b.y)
 
 
-func translate(p: Point, v: Vector): Point =
+func to_vector*(angle: Angle, length: float): Vector =
+  ## Angle, distance -> Vector
+  Vector(x: cos(angle) * length,
+         y: sin(angle) * length)
+
+
+func translate*(p: Point, v: Vector): Point =
   ## Translate Point `p` by Vector `v`
   Point(x: p.x + v.x, y: p.y + v.y)
 
@@ -82,6 +88,17 @@ func rotate*(poly: Polygon, delta: Angle): Polygon =
   )
 
 
+func len*(seg: Segment): float =
+  ## Length of a line Segment (pythagoras)
+  sqrt((seg.b.x - seg.a.x)^2 + (seg.b.y - seg.a.x)^2)
+
+
+func point_at_scalar*(seg: Segment, scalar: float): Point =
+  ## Returns the Point at `scalar` along the given Segment
+  Point(x: (seg.b.x - seg.a.x) * scalar,
+        y: (seg.b.y - seg.a.y) * scalar)
+
+
 func intersection*(sega, segb: Segment): Option[Point] =
   ## Get Point of intersection, between two segments,
   ## returns None if no interaction was found
@@ -102,9 +119,6 @@ func intersection*(sega, segb: Segment): Option[Point] =
     # dultiply line segment by scalar to get the point of intersection.
     # doesn't matter if use `sega` or `segb`, as the intersection point
     # is the exact same.
-    return some(Point(
-      x: (sega.b.x - sega.a.x) * ascal,
-      y: (sega.b.y - sega.a.y) * ascal
-    ))
+    return some(point_at_scalar(sega, ascal))
   else:
     return none(Point)
