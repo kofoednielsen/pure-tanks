@@ -13,12 +13,12 @@ suite "movement tests":
       center: Point(x: 100, y: 100),
       segments: @[
         Segment(a: Point(x: 50, y: 50),    # (50, 50)    (150, 50)
-                b: Point(x: 150, y: 50)),  #      +---------+
-        Segment(a: Point(x: 150, y: 50),   #      |         |
-                b: Point(x: 150, y: 150)), #      |  (100,  |
-        Segment(a: Point(x: 150, y: 150),  #      |   100)  |
-                b: Point(x: 50, y: 150)),  #      |         |
-        Segment(a: Point(x: 50, y: 150),   #      +---------+
+                b: Point(x: 150, y: 50)),  #    +------------+
+        Segment(a: Point(x: 150, y: 50),   #    |            |
+                b: Point(x: 150, y: 150)), #    | (100, 100) |
+        Segment(a: Point(x: 150, y: 150),  #    |            |
+                b: Point(x: 50, y: 150)),  #    |            |
+        Segment(a: Point(x: 50, y: 150),   #    +------------+
                 b: Point(x: 50, y: 50))    # (50, 150)   (150, 150)
       ]
     )
@@ -27,12 +27,12 @@ suite "movement tests":
       center: Point(x: 200, y: 150),
       segments: @[
         Segment(a: Point(x: 250, y: 100),  # (250, 100)   (350, 100)
-                b: Point(x: 350, y: 100)), #      +---------+
-        Segment(a: Point(x: 350, y: 100),  #      |         |
-                b: Point(x: 350, y: 200)), #      |  (200,  |
-        Segment(a: Point(x: 350, y: 200),  #      |   150)  |
-                b: Point(x: 250, y: 200)), #      |         |
-        Segment(a: Point(x: 250, y: 200),  #      +---------+
+                b: Point(x: 350, y: 100)), #     +------------+
+        Segment(a: Point(x: 350, y: 100),  #     |            |
+                b: Point(x: 350, y: 200)), #     | (200, 150) |
+        Segment(a: Point(x: 350, y: 200),  #     |            |
+                b: Point(x: 250, y: 200)), #     |            |
+        Segment(a: Point(x: 250, y: 200),  #     +------------+
                 b: Point(x: 250, y: 100))  # (250, 200)   (350, 200)
       ]
     )
@@ -62,19 +62,20 @@ suite "movement tests":
     ]
     check(collision_points(config, seg) == expected)
 
+
   test "Test collision points on tiny polygon":
     let tinypoly = Polygon(
       angle: Angle(0),
       center: Point(x: 2, y: 2),
       segments: @[
-        Segment(a: Point(x: 0, y: 0),    #   (0, 4)      (4, 4)
+        Segment(a: Point(x: 0, y: 0),    #   (0, 0)     (4, 0)
                 b: Point(x: 4, y: 0)),   #      +---------+
         Segment(a: Point(x: 4, y: 0),    #      |         |
                 b: Point(x: 4, y: 4)),   #      |  (2,2)  |
         Segment(a: Point(x: 4, y: 4),    #      |         |
                 b: Point(x: 0, y: 4)),   #      |         |
         Segment(a: Point(x: 0, y: 4),    #      +---------+
-                b: Point(x: 0, y: 0))    #   (0, 0)      (4, 0)
+                b: Point(x: 0, y: 0))    #   (0, 4)      (4, 4)
       ]
     )
 
