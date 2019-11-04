@@ -46,6 +46,27 @@ func collision_points*(config: Config, poly: Polygon): seq[Point] =
   ## Get collision Points on surface of Polygon
   poly.segments.map(seg => collision_points(config, seg)).concat()
 
+func get_collidables*(state: GameState, player: Player): seq[Collidable] =
+  ## make Collidables of all game objects (except currently moving Player)
+  let otherplayers = state.players.filter(p => p != player)
+  let
+    playercolls: seq[Collidable] = otherplayers.map(
+      p => map(p.shape.segments,
+        s => Collidable(kind: PlayerKind,
+                        player: p,
+                        segment: s))).concat().concat()
+    projectilecolls: seq[Collidable] = state.projectiles.map(
+      p => map(p.shape.segments,
+        s => Collidable(kind: ProjectileKind,
+                        projectile: p,
+                        segment: s))).concat().concat()
+    boxcolls: seq[Collidable] = state.map.map(
+      b => map(b.shape.segments,
+        s => Collidable(kind: BoxKind,
+                        box: b,
+                        segment: s))).concat().concat()
+  let result = playercolls & projectilecolls & boxcolls
+
 
 func linear_move_func*(direction: int): auto =
   ## Returns a function for moving a player either forwards or backward
@@ -66,22 +87,7 @@ func linear_move_func*(direction: int): auto =
     # movement lines for each collision point
     let movesegs = collpoints.map(p => Segment(a: p, b: p.translate(idealvec)))
 
-    # make Collidables of all game objects (except currently moving Player)
-    let otherplayers = info.state.players.filter(p => p != player)
-    let
-      playercolls: seq[Collidable] = otherplayers.map(
-        p => map(p.shape.segments, s => Collidable(kind: PlayerKind,
-                                                   player: p,
-                                                   segment: s))).concat().concat()
-      projectilecolls: seq[Collidable] = info.state.projectiles.map(
-        p => map(p.shape.segments, s => Collidable(kind: ProjectileKind,
-                                                   projectile: p,
-                                                   segment: s))).concat().concat()
-      boxcolls: seq[Collidable] = info.state.map.map(
-        b => map(b.shape.segments, s => Collidable(kind: BoxKind,
-                                                   box: b,
-                                                   segment: s))).concat().concat()
-    let collidables: seq[Collidable] = playercolls & projectilecolls & boxcolls
+    let collidables: seq[Collidable] = get_collidables(info.state, player)
 
     # wtf
     let colloptions: seq[CollOption] = map(movesegs,
