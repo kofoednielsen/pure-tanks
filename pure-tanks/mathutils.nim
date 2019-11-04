@@ -90,13 +90,13 @@ func rotate*(poly: Polygon, delta: Angle): Polygon =
 
 func len*(seg: Segment): float =
   ## Length of a line Segment (pythagoras)
-  sqrt((seg.b.x - seg.a.x)^2 + (seg.b.y - seg.a.x)^2)
+  sqrt((seg.b.x - seg.a.x)^2 + (seg.b.y - seg.a.y)^2)
 
 
 func point_at_scalar*(seg: Segment, scalar: float): Point =
   ## Returns the Point at `scalar` along the given Segment
-  Point(x: (seg.b.x - seg.a.x) * scalar,
-        y: (seg.b.y - seg.a.y) * scalar)
+  Point(x: seg.a.x + (seg.b.x - seg.a.x) * scalar,
+        y: seg.a.y + (seg.b.y - seg.a.y) * scalar)
 
 
 func intersection*(sega, segb: Segment): Option[Point] =
