@@ -62,6 +62,48 @@ suite "movement tests":
     ]
     check(collision_points(config, seg) == expected)
 
+  test "Test collision points on tiny polygon":
+    let tinypoly = Polygon(
+      angle: Angle(0),
+      center: Point(x: 2, y: 2),
+      segments: @[
+        Segment(a: Point(x: 0, y: 0),    #   (0, 4)      (4, 4)
+                b: Point(x: 4, y: 0)),   #      +---------+
+        Segment(a: Point(x: 4, y: 0),    #      |         |
+                b: Point(x: 4, y: 4)),   #      |  (2,2)  |
+        Segment(a: Point(x: 4, y: 4),    #      |         |
+                b: Point(x: 0, y: 4)),   #      |         |
+        Segment(a: Point(x: 0, y: 4),    #      +---------+
+                b: Point(x: 0, y: 0))    #   (0, 0)      (4, 0)
+      ]
+    )
+
+    let expected = @[
+      Point(x: 0, y: 0),
+      Point(x: 1, y: 0),
+      Point(x: 2, y: 0),
+      Point(x: 3, y: 0),
+      Point(x: 4, y: 0),
+
+      Point(x: 4, y: 0),
+      Point(x: 4, y: 1),
+      Point(x: 4, y: 2),
+      Point(x: 4, y: 3),
+      Point(x: 4, y: 4),
+
+      Point(x: 4, y: 4),
+      Point(x: 3, y: 4),
+      Point(x: 2, y: 4),
+      Point(x: 1, y: 4),
+      Point(x: 0, y: 4),
+
+      Point(x: 0, y: 4),
+      Point(x: 0, y: 3),
+      Point(x: 0, y: 2),
+      Point(x: 0, y: 1),
+      Point(x: 0, y: 0),
+    ]
+    check(collision_points(config, tinypoly) == expected)
 
   test "test get_collidables":
     let expected : seq[Collidable] = @[
