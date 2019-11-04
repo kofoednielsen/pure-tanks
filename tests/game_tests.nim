@@ -104,10 +104,10 @@ suite "Game logic tests":
   
 
   test "simple move forward, then backwards":
-    let newstateone = update(state, config, 100,
+    let newstateone = update(state, config, 10,
                              @[Command((name: Name("John"), action: forward))])
-    check(newstateone.players[0].shape.center == Point(x: 200.0, y: 100.0))
-    let newstatetwo = update(newstateone, config, 100,
+    check(newstateone.players[0].shape.center == Point(x: 110.0, y: 100.0))
+    let newstatetwo = update(newstateone, config, 10,
                              @[Command((name: Name("John"), action: backward))])
     check(newstatetwo.players[0].shape.center == Point(x: 100.0, y: 100.0))
 
