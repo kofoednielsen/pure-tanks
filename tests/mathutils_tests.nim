@@ -4,6 +4,7 @@ import unittest, strutils, math, options
 # app imports
 import mathutils, types
 
+
 suite "wrap_angle tests":
   test "test 2 PI wraps to 0 PI":
     check(wrap_angle(2 * PI) =~ 0)
@@ -61,6 +62,12 @@ suite "intersection tests":
       a: Point(x: 0, y: 5),
       b: Point(x: 50, y: 50)
     )
+
+  test "test len of segment":
+    let seg = Segment(a: Point(x: 4, y: 0),
+                      b: Point(x: 4, y: 4))
+    let expected = 4.0
+    check(len(seg) == expected)
 
   test "simple intersection":
     let isect = intersection(intersectingseg1,
