@@ -7,20 +7,20 @@ import types, mathutils
 
 # type used to represent possible collisions when moving
 type
-  CollidableKind = enum
+  CollidableKind* = enum
     PlayerKind,
     ProjectileKind,
     BoxKind
 
-  Collidable = object
-    case kind: CollidableKind
+  Collidable* = object
+    case kind*: CollidableKind
     of PlayerKind:
-      player: Player
+      player*: Player
     of ProjectileKind:
-      projectile: Projectile
+      projectile*: Projectile
     of BoxKind:
-      box: Box
-    segment: Segment
+      box*: Box
+    segment*: Segment
 
   CollOption = tuple[collidable: Collidable,
                         startp: Point,
@@ -65,7 +65,7 @@ func get_collidables*(state: GameState, player: Player): seq[Collidable] =
         s => Collidable(kind: BoxKind,
                         box: b,
                         segment: s))).concat().concat()
-  let result = playercolls & projectilecolls & boxcolls
+  return playercolls & projectilecolls & boxcolls
 
 
 func linear_move_func*(direction: int): auto =
