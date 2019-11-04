@@ -62,6 +62,20 @@ suite "movement tests":
     ]
     check(collision_points(config, seg) == expected)
 
+
+  test "test collision_points on single segment 2":
+    let seg = Segment(a: Point(x: 4, y: 0),
+                      b: Point(x: 4, y: 4))
+    let expected = @[
+      Point(x: 4, y: 0),
+      Point(x: 4, y: 1),
+      Point(x: 4, y: 2),
+      Point(x: 4, y: 3),
+      Point(x: 4, y: 4),
+    ]
+    check(collision_points(config, seg) == expected)
+
+
   test "Test collision points on tiny polygon":
     let tinypoly = Polygon(
       angle: Angle(0),
