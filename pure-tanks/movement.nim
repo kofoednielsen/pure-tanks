@@ -94,7 +94,7 @@ func linear_move_func*(direction: int): auto =
       ms => map(collidables,
         coll => (collidable: coll,
                  startp: ms.a,
-                 collp: intersection(coll.segment, ms)))).concat().concat()
+                 collp: intersection(coll.segment, ms)))).concat()
     # i give up
     let collisions: seq[CollOption] = colloptions.filter(co => co.collp.is_some())
 

@@ -1,5 +1,5 @@
 # std imports
-import unittest
+import unittest, sequtils, sugar
 # app imports
 import movement, types
 
@@ -78,4 +78,7 @@ suite "movement tests":
                   player: pa,
                   segment: pa.shape.segments[3])
     ]
-    check(get_collidables(state, pb) == expected)
+
+    check(get_collidables(state, pb).map(c => c.kind) == expected.map(c => c.kind))
+    check(get_collidables(state, pb).map(c => c.player) == expected.map(c => c.player))
+    check(get_collidables(state, pb).map(c => c.segment) == expected.map(c => c.segment))
