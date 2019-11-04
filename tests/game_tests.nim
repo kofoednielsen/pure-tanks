@@ -70,6 +70,7 @@ suite "Game logic tests":
       movementspeed: 1,
       rotationspeed: PI/4,
       projectilespeed: 1.5,
+      collisionpointdist: 1
     )
 
 

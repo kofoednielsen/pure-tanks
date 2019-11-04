@@ -33,7 +33,7 @@ func `<`(a, b: CollOption): bool =
    len(Segment(a: b.startp, b: b.collp.get())))
 
 
-func collision_points(config: Config, seg: Segment): seq[Point] =
+func collision_points*(config: Config, seg: Segment): seq[Point] =
   ## Get collision Points on Segment
   let dist = config.collisionpointdist
   let length = len(seg)
@@ -42,7 +42,7 @@ func collision_points(config: Config, seg: Segment): seq[Point] =
   return map(scalars, s => point_at_scalar(seg, s))
 
 
-func collision_points(config: Config, poly: Polygon): seq[Point] =
+func collision_points*(config: Config, poly: Polygon): seq[Point] =
   ## Get collision Points on surface of Polygon
   poly.segments.map(seg => collision_points(config, seg)).concat()
 
