@@ -27,12 +27,6 @@ type
                         collp: Option[Point]]
 
 
-func `<`(a, b: CollOption): bool =
-  ## Compares CollOptions (in order to easily find minimum)
-  (len(Segment(a: a.startp, b: a.collp.get())) <
-   len(Segment(a: b.startp, b: b.collp.get())))
-
-
 func collision_points*(config: Config, seg: Segment): seq[Point] =
   ## Get collision Points on Segment
   let dist = config.collisionpointdist
@@ -73,13 +67,13 @@ func linear_move_func*(direction: int): auto =
   assert(direction in [-1, 1], "Only allowed directions are 1 and -1")
   return func(info: UpdateInfo, player: Player): Player =
     # Move the player and return the resulting player object
-    let distance = (info.config.movementspeed *
+    let idealdistance = (info.config.movementspeed *
                     info.config.timemod *
                     float(info.dt) *
                     float(direction))  # direction coefficient
 
     # ideal movement vector (if we don't collide, do this)
-    let idealvec = to_vector(player.shape.angle, distance)
+    let idealvec = to_vector(player.shape.angle, idealdistance)
 
     # colliding points on Polygon
     let collpoints = collision_points(info.config, player.shape)
@@ -89,24 +83,25 @@ func linear_move_func*(direction: int): auto =
 
     let collidables: seq[Collidable] = get_collidables(info.state, player)
 
-    # wtf
+    # Check for intersections between collidables and movesegments
+    # save as ColOptions
     let colloptions: seq[CollOption] = map(movesegs,
       ms => map(collidables,
         coll => (collidable: coll,
                  startp: ms.a,
                  collp: intersection(coll.segment, ms)))).concat()
-    # i give up
-    let collisions: seq[CollOption] = colloptions.filter(co => co.collp.is_some())
+    # get the coloptions, that had an intersection
+    let collisions = colloptions.filter(co => co.collp.is_some())
 
-    # end me
-    let mvdist = func(): float =
-      if len(collisions) == 0:
-        return distance
-      let closest = min(collisions)
-      return Segment(a: closest.startp,
-                     b: closest.collp.get()).len()
+    # get the movement distances of the collision and append idealdistance
+    # this way, we can take the minimum, and fallback on the idealdistance
+    # in case of no collisions
+    let distances = collisions.map(c => len(Segment(a: c.startp,
+                                                    b: c.collp.get()))
+                                   ) & idealdistance
 
-    let newshape = move(player.shape, mvdist())
+    # move to the closest distance
+    let newshape = move(player.shape, min(distances))
     return Player(shape: newshape,
                   kills: player.kills,
                   deaths: player.deaths,
