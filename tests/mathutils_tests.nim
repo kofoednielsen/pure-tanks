@@ -62,15 +62,35 @@ suite "intersection tests":
       b: Point(x: 50, y: 50)
     )
 
-  test "simple intersection":
+  test "simple segment intersection":
     let isect = intersection(intersectingseg1,
                              intersectingseg2)
     check(isect.get() =~ Point(x: 1, y: 1))
 
-  test "parallels dont intersect":
+  test "parallel segments dont intersect":
     let isect = intersection(parallel1, parallel2)
     check(isect.is_none())
 
-  test "non-intersecting lines":
+  test "non-intersecting segments":
     let isect = intersection(intersectingseg1, parallel1)
     check(isect.is_none())
+
+
+suite "circular arc intersections":
+  setup:
+    # "half moon" shaped circle segment
+    let circle = CircleArc(
+      center: Point(x: 0, y: 0),
+      radius: 1,
+      a: Angle(0),
+      b: Angle(PI)
+    )
+    let intersectsegment = Segment(
+      a: Point(x: 0, y: 0),
+      b: Point(x: 0, y: 2)
+    )
+
+
+  test "simple segment and arc intersection":
+    let isect = intersection(circle, intersectsegment)
+    check(isect =~ Point(x: 0, y: 1))

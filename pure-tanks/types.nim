@@ -11,6 +11,11 @@ type
   Segment* = object
     a*, b*: Point
 
+  CircleArc* = object
+    center*: Point,
+    radius*: float,
+    a*, b*: Angle
+
   Polygon* = object
     center*: Point
     angle*: Angle
@@ -58,9 +63,9 @@ type
 type
   Config* = object
     timemod*: float
-    rotationspeed*: float    #  radians/microseconds [-PI;PI]
-    movementspeed*: float    #  distance/microseconds
-    projectilespeed*: float  #  distance/microseconds
+    rotationspeed*: float      #  radians/microseconds [-PI;PI]
+    movementspeed*: float      #  distance/microseconds
+    projectilespeed*: float    #  distance/microseconds
     collisionpointdist*: float # distance between collision points on a segment
 
   UpdateInfo* = object
