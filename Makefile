@@ -11,7 +11,7 @@ test: $(TESTS)
 		./build/$${test}; \
 	done;
 
-$(TESTS):
+$(TESTS): clean
 	@-nim c \
 	-p:pure-tanks/ \
 	--out:build/$@ \
@@ -20,4 +20,4 @@ $(TESTS):
 	tests/$@.nim \
 
 clean:
-	rm -r ./build/
+	rm -r ./build/ || true

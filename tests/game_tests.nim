@@ -25,18 +25,9 @@ suite "Game logic tests":
       deaths: 1
     )
 
-    let peter = Player(
-      name: Name("Peter"),
-      shape: Polygon(
-        angle: Angle(PI),  #  facing left
-        center: Point(x: 200.0, y: 200.0),
-        segments: @[]
-      ),
-      kills: 5,
-      deaths: 2
-    )
-
-    let blockingsquare = Polygon(
+    # 100x100 square, centered at (300, 100)
+    # (leftmost points are x=250, y=50..150)
+    let johnblockersquare = Polygon(
       angle: Angle(0),
       center: Point(x: 200, y: 150),
       segments: @[
@@ -50,18 +41,53 @@ suite "Game logic tests":
                 b: Point(x: 250, y: 100))  # (250, 200)   (350, 200)
       ]
     )
-    # 100x100 square, centered at (300, 100)
-    # (leftmost points are x=250, y=50..150)
     let johnblocker = Player(
       name: Name("JohnBlocker"),
-      shape: blockingsquare,
+      shape: johnblockersquare,
       kills: 1337,
+      deaths: 0
+    )
+
+    let peter = Player(
+      name: Name("Peter"),
+      shape: Polygon(
+        angle: Angle(PI),  #  facing left
+        center: Point(x: 2000.0, y: 2000.0),
+        segments: @[
+          Segment(a: Point(x: 1950, y: 1950),  # (1950, 1950)(2050, 1950)
+                  b: Point(x: 2050, y: 1950)), #      +---------+
+          Segment(a: Point(x: 2050, y: 1950),  #      |         |
+                  b: Point(x: 2050, y: 2050)), #      |  (100,  |
+          Segment(a: Point(x: 2050, y: 2050),  #      |   100)  |
+                  b: Point(x: 1950, y: 2050)), #      |         |
+          Segment(a: Point(x: 1950, y: 2050),  #      +---------+
+                  b: Point(x: 1950, y: 1950))  # (1950, 2050)(2050, 2050)
+        ]
+      ),
+      kills: 5,
+      deaths: 2
+    )
+
+    # a totally flat and very small wall
+    # designed for peter to run into
+    let peterblockersquare = Polygon(
+      angle: Angle(0),
+      center: Point(x: 200, y: 150),
+      segments: @[
+        Segment(a: Point(x: 0, y: 1999),
+                b: Point(x: 0, y: 2001))
+      ]
+    )
+    let peterblocker = Player(
+      name: Name("PeterBlocker"),
+      shape: peterblockersquare,
+      kills: 5318008,
       deaths: 0
     )
 
     let state = GameState(
       projectiles: @[],
-      players: @[john, peter, johnblocker],
+      players: @[john, peter, johnblocker, peterblocker],
       map: Map(@[])
     )
 
@@ -70,6 +96,7 @@ suite "Game logic tests":
       movementspeed: 1,
       rotationspeed: PI/4,
       projectilespeed: 1.5,
+      collisionpointdist: 1
     )
 
 
@@ -89,7 +116,7 @@ suite "Game logic tests":
     ]
     let newstate = update(state, config, 100, commands)
     check(newstate.players[0].shape.center == Point(x: 200.0, y: 100.0))
-    check(newstate.players[1].shape.center == Point(x: 100.0, y: 200.0))
+    check(newstate.players[1].shape.center == Point(x: 1900.0, y: 2000.0))
   
 
   test "simple move backward":
@@ -99,14 +126,14 @@ suite "Game logic tests":
     ]
     let newstate = update(state, config, 100, commands)
     check(newstate.players[0].shape.center == Point(x: 0.0, y: 100.0))
-    check(newstate.players[1].shape.center == Point(x: 300.0, y: 200.0))
+    check(newstate.players[1].shape.center == Point(x: 2100.0, y: 2000.0))
   
 
   test "simple move forward, then backwards":
-    let newstateone = update(state, config, 100,
+    let newstateone = update(state, config, 10,
                              @[Command((name: Name("John"), action: forward))])
-    check(newstateone.players[0].shape.center == Point(x: 200.0, y: 100.0))
-    let newstatetwo = update(newstateone, config, 100,
+    check(newstateone.players[0].shape.center == Point(x: 110.0, y: 100.0))
+    let newstatetwo = update(newstateone, config, 10,
                              @[Command((name: Name("John"), action: backward))])
     check(newstatetwo.players[0].shape.center == Point(x: 100.0, y: 100.0))
 
@@ -136,3 +163,10 @@ suite "Game logic tests":
     let newstate = update(state, config, 1000, @[movecmd])
     let movedjohn = newstate.players[0]
     check(movedjohn.shape.center == Point(x: 200, y: 100))
+
+
+  test "move blocked with very small shape":
+    let movecmd = Command((name: Name("Peter"), action: forward))
+    let newstate = update(state, config, 3000, @[movecmd])
+    let movedpeter = newstate.players[1]
+    check(movedpeter.shape.center =~ Point(x: 50, y: 2000))
