@@ -8,15 +8,36 @@ import sugar
 import types
 
 
-func `=~` *(a, b: float): bool =
+func `=~`*(a, b: float): bool =
   ## Define `=~` operator for approximate float comparisions
   const eps = 1.0e-7
   return abs(a - b) < eps
 
 
-func `=~` *(a, b: Point): bool =
+func `=~`*(a, b: Point): bool =
   ## Define `=~` operator for approximate point comparisions
   (a.x =~ b.x) and (a.y =~ b.y)
+
+
+func dot*(a, b: Vector): float =
+  ## Dot product of two vectors
+  (a.x * b.x) + (a.y * b.y)
+
+
+func len*(v: Vector): float =
+  ## Length of a Vector (pythagoras)
+  sqrt(v.x^2 + v.y^2)
+
+
+func len*(seg: Segment): float =
+  ## Length of a line Segment (pythagoras)
+  sqrt((seg.b.x - seg.a.x)^2 + (seg.b.y - seg.a.y)^2)
+
+
+func point_at_scalar*(seg: Segment, scalar: float): Point =
+  ## Returns the Point at `scalar` along the given Segment
+  Point(x: seg.a.x + (seg.b.x - seg.a.x) * scalar,
+        y: seg.a.y + (seg.b.y - seg.a.y) * scalar)
 
 
 func to_vector*(angle: Angle, length: float): Vector =
@@ -88,17 +109,6 @@ func rotate*(poly: Polygon, delta: Angle): Polygon =
   )
 
 
-func len*(seg: Segment): float =
-  ## Length of a line Segment (pythagoras)
-  sqrt((seg.b.x - seg.a.x)^2 + (seg.b.y - seg.a.y)^2)
-
-
-func point_at_scalar*(seg: Segment, scalar: float): Point =
-  ## Returns the Point at `scalar` along the given Segment
-  Point(x: seg.a.x + (seg.b.x - seg.a.x) * scalar,
-        y: seg.a.y + (seg.b.y - seg.a.y) * scalar)
-
-
 func intersection*(sega, segb: Segment): Option[Point] =
   ## Get Point of intersection, between two segments,
   ## returns None if no interaction was found
@@ -122,3 +132,11 @@ func intersection*(sega, segb: Segment): Option[Point] =
     return some(point_at_scalar(sega, ascal))
   else:
     return none(Point)
+
+
+func intersection*(arc: CircleArc, seg: Segment): Point =
+  ## Find intersection Point between CircleArc and Segment
+  # let delta = Segment(a: seg.a.x - arc.center.x,
+  #                     b: arc.a.y - arc.center.y)
+  # let partiald = length
+  Point(x: 0, y: 0)

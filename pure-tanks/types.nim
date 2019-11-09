@@ -12,8 +12,8 @@ type
     a*, b*: Point
 
   CircleArc* = object
-    center*: Point,
-    radius*: float,
+    center*: Point
+    radius*: float
     a*, b*: Angle
 
   Polygon* = object

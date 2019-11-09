@@ -16,6 +16,22 @@ suite "wrap_angle tests":
     check(wrap_angle(-7 * PI/4) =~ PI/4)
 
 
+suite "vector tests":
+  setup:
+    let vec1 = Vector(x: 2, y: 2)
+    let vec2 = Vector(x: -2, y: 2)
+    let vec3 = Vector(x: 5, y: 9)
+
+  test "vector length":
+    check(len(vec1) =~ 2.82842712474619)
+    check(len(vec2) =~ 2.82842712474619)
+    check(len(vec3) =~ 10.295630140987)
+
+  test "vector dot product":
+    check(dot(vec1, vec2) == 0.0)
+    check(dot(vec2, vec3) == 8.0)
+
+
 suite "rotate tests":
   setup:
     let poly = Polygon(
@@ -96,7 +112,6 @@ suite "circular arc intersections":
       a: Point(x: 0, y: 0),
       b: Point(x: 0, y: 2)
     )
-
 
   test "simple segment and arc intersection":
     let isect = intersection(circle, intersectsegment)
