@@ -108,11 +108,11 @@ suite "circular arc intersections":
       a: Angle(0),
       b: Angle(PI)
     )
-    let intersectsegment = Segment(
-      a: Point(x: 0, y: 0),
-      b: Point(x: 0, y: 2)
-    )
+    # line starting at origin going straight up
+    let intersectsegment = Segment(a: Point(x: 0, y: 0),
+                                   b: Point(x: 0, y: 4))
 
   test "simple segment and arc intersection":
     let isect = intersection(circle, intersectsegment)
-    check(isect =~ Point(x: 0, y: 1))
+    check(isect.is_some())
+    check(isect.get() == Point(x: 0, y: 1))

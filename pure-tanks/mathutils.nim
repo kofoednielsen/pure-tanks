@@ -8,13 +8,13 @@ import sugar
 import types
 
 
-func `=~`*(a, b: float): bool =
+func `=~` *(a, b: float): bool =
   ## Define `=~` operator for approximate float comparisions
   const eps = 1.0e-7
   return abs(a - b) < eps
 
 
-func `=~`*(a, b: Point): bool =
+func `=~` *(a, b: Point): bool =
   ## Define `=~` operator for approximate point comparisions
   (a.x =~ b.x) and (a.y =~ b.y)
 
@@ -22,6 +22,14 @@ func `=~`*(a, b: Point): bool =
 func dot*(a, b: Vector): float =
   ## Dot product of two vectors
   (a.x * b.x) + (a.y * b.y)
+
+
+func `*` (f: float, v: Vector): Vector =
+  ## Transform Vector `v` by scalar `f`
+  Vector(x: v.x * f,
+         y: v.y * f)
+
+func `*` (i: int, v: Vector): Vector = float(i) * v
 
 
 func len*(v: Vector): float =
@@ -134,9 +142,32 @@ func intersection*(sega, segb: Segment): Option[Point] =
     return none(Point)
 
 
-func intersection*(arc: CircleArc, seg: Segment): Point =
+func intersection*(arc: CircleArc, seg: Segment): Option[Point] =
   ## Find intersection Point between CircleArc and Segment
-  # let delta = Segment(a: seg.a.x - arc.center.x,
-  #                     b: arc.a.y - arc.center.y)
-  # let partiald = length
-  Point(x: 0, y: 0)
+  ## https://www.geometrictools.com/Documentation/IntersectionLine2Circle2.pdf
+  # delta = seg.a - arc.center
+  let Δ = Vector(x: seg.a.x - arc.center.x,
+                     y: seg.a.y - arc.center.y)
+ 
+  # D = seg.b - seg.a
+  # (vector spanning from start of seg to end of seg)
+  let D = Vector(x: seg.b.x - seg.a.x,
+                 y: seg.b.y - seg.a.y)
+
+  # 𝛿 used to determine if there is an intersection
+  let 𝛿 = dot(D, Δ)^2 - (len(D)^2 * (len(Δ)^2 - arc.radius^2))
+  if 𝛿 < 0:  # no intersection
+    return none(Point)
+
+  # an intersection!
+  # find where on the Segment
+  # XXX: this could defintely be optimized
+  let tplus = ((-1 * dot(D, Δ)) + sqrt(𝛿)) / len(D)^2
+  let tminus = ((-1 * dot(D, Δ)) - sqrt(𝛿)) / len(D)^2
+
+  # filter for values in range [0;1]
+  let tvalid = @[tplus, tminus].filter(t => 0 <= t and t <= 1)
+  assert(len(tvalid) == 1, "Got `t` outside [0; 1]")
+
+  # get the point and return
+  return some(point_at_scalar(seg, tvalid[0]))
