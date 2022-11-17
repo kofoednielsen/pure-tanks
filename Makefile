@@ -11,6 +11,10 @@ test: $(TESTS)
 		./build/$${test}; \
 	done;
 
+run:
+	nim compile --out:./build/pure-tanks ./pure-tanks/frontend.nim 
+	./build/pure-tanks
+
 $(TESTS): clean
 	@-nim c \
 	-p:pure-tanks/ \
