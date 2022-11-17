@@ -37,13 +37,15 @@ suite "rotate tests":
     let poly = Polygon(
       center: Point(x: 0, y: 0),
       angle: 0,
-      segments: @[]
+      segments: @[Segment(a: Point(x: 0, y: 0), b: Point(x: 0, y: 1))]
     )
     let firstquadrantpoint = Point(x: 1, y: 1)
 
   test "quarter rotate polygon - check angle":
     let rotated = rotate(poly, PI / 2)
     check(rotated.angle =~ Angle(PI / 2))
+    check(rotated.segments[0].b.y =~ 0)
+    check(rotated.segments[0].b.x =~ -1)
 
   test "full rotate polygon - check angle":
     let rotated = rotate(poly, 2 * PI)

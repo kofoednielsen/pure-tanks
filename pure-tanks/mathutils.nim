@@ -91,7 +91,7 @@ func rotate*(p: Point, c: Point, delta: Angle): Point =
   # rotate around origin
   let rotated = Point(
     x: (po.x * cos(delta)) - (po.y * sin(delta)),
-    y: (po.y * cos(delta)) - (po.y * sin(delta)),
+    y: (po.y * cos(delta)) + (po.x * sin(delta)),
   )
   # shift back to original placement
   let newp = translate(rotated, Vector(x: c.x, y: c.y))
