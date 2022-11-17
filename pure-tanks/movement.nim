@@ -1,5 +1,5 @@
 # std imports
-import options, sequtils, sugar
+import options, sequtils, sugar, math
 
 # game imports
 import types, mathutils
@@ -69,11 +69,10 @@ func linear_move_func*(direction: int): auto =
     # Move the player and return the resulting player object
     let idealdistance = (info.config.movementspeed *
                     info.config.timemod *
-                    float(info.dt) *
-                    float(direction))  # direction coefficient
+                    float(info.dt))
 
     # ideal movement vector (if we don't collide, do this)
-    let idealvec = to_vector(player.shape.angle, idealdistance)
+    let idealvec = to_vector(wrap_angle(player.shape.angle + (if direction == -1: PI else: 0.0)), idealdistance)
 
     # colliding points on Polygon
     let collpoints = collision_points(info.config, player.shape)
@@ -101,7 +100,7 @@ func linear_move_func*(direction: int): auto =
                                    ) & idealdistance
 
     # move to the closest distance
-    let newshape = move(player.shape, min(distances))
+    let newshape = move(player.shape, min(distances) * float(direction))
     return Player(shape: newshape,
                   kills: player.kills,
                   deaths: player.deaths,

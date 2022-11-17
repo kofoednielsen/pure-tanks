@@ -4,23 +4,33 @@ import types, game, mathutils
 suite "Game logic tests":
   setup:
     # 100x100 square, centered at (100, 100), facing right
-    let hundredsquare = Polygon(
-      angle: Angle(0),
-      center: Point(x: 100, y: 100),
-      segments: @[
-        Segment(a: Point(x: 50, y: 50),    # (50, 50)    (150, 50)
-                b: Point(x: 150, y: 50)),  #      +---------+
-        Segment(a: Point(x: 150, y: 50),   #      |         |
-                b: Point(x: 150, y: 150)), #      |  (100,  |
-        Segment(a: Point(x: 150, y: 150),  #      |   100)  |
-                b: Point(x: 50, y: 150)),  #      |         |
-        Segment(a: Point(x: 50, y: 150),   #      +---------+
-                b: Point(x: 50, y: 50))    # (50, 150)   (150, 150)
-      ]
-    )
+    let hundredsquare_segments = @[
+      Segment(a: Point(x: 50, y: 50),    # (50, 50)    (150, 50)
+              b: Point(x: 150, y: 50)),  #      +---------+
+      Segment(a: Point(x: 150, y: 50),   #      |         |
+              b: Point(x: 150, y: 150)), #      |  (100,  |
+      Segment(a: Point(x: 150, y: 150),  #      |   100)  |
+              b: Point(x: 50, y: 150)),  #      |         |
+      Segment(a: Point(x: 50, y: 150),   #      +---------+
+              b: Point(x: 50, y: 50))    # (50, 150)   (150, 150)
+    ]
     let john = Player(
       name: Name("John"),
-      shape: hundredsquare,
+      shape: Polygon(
+        angle: Angle(0),
+        segments: hundredsquare_segments,
+        center: Point(x: 100, y: 100),
+      ),
+      kills: 3,
+      deaths: 1
+    )
+    let backwards_john = Player(
+      name: Name("John"),
+      shape: Polygon(
+        angle: Angle(PI),
+        segments: hundredsquare_segments,
+        center: Point(x: 100, y: 100),
+      ),
       kills: 3,
       deaths: 1
     )
@@ -88,6 +98,12 @@ suite "Game logic tests":
     let state = GameState(
       projectiles: @[],
       players: @[john, peter, johnblocker, peterblocker],
+      map: Map(@[])
+    )
+
+    let state_with_backwards_john = GameState(
+      projectiles: @[],
+      players: @[backwards_john, peter, johnblocker, peterblocker],
       map: Map(@[])
     )
 
@@ -163,6 +179,13 @@ suite "Game logic tests":
     let newstate = update(state, config, 1000, @[movecmd])
     let movedjohn = newstate.players[0]
     check(movedjohn.shape.center == Point(x: 200, y: 100))
+
+  test "blocked move backwards":
+    let movecmd = Command((name: Name("John"), action: backward))
+    let newstate = update(state_with_backwards_john, config, 1000, @[movecmd])
+    let movedjohn = newstate.players[0]
+    check(movedjohn.shape.center.x =~ 200)
+    check(movedjohn.shape.center.y =~ 100)
 
 
   test "move blocked with very small shape":
